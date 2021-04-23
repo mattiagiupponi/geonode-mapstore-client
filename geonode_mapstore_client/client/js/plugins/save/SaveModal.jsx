@@ -39,6 +39,11 @@ function SaveModal({
     const [description, setDescription] =  useState('');
     const [nameValidation, setNameValidation] =  useState(false);
 
+    const checkIsEditMode = () => {
+        const {pathname = ""} = new window.URL(window.location.href)
+        return pathname.includes("edit");
+    }
+
     const state = useRef();
     state.current = {
         contentId,
@@ -67,11 +72,12 @@ function SaveModal({
     }, [ enabled, loading ]);
 
     const isLoading = loading || saving;
+    const isEditing = checkIsEditMode();
 
     return (
         <ResizableModal
             title={<Message msgId={labelId}/>}
-            show={enabled}
+            show={enabled && !isEditing}
             fitContent
             clickOutEnabled={false}
             buttons={isLoading
