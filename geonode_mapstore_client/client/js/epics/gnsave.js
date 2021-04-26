@@ -19,8 +19,8 @@ import { saveMapConfiguration } from '@mapstore/framework/utils/MapUtils';
 import { getConfigProp } from '@mapstore/framework/utils/ConfigUtils';
 import { currentStorySelector } from '@mapstore/framework/selectors/geostory';
 import { userSelector } from '@mapstore/framework/selectors/security';
-import { TOGGLE_CONTROL } from '@mapstore/framework/actions/controls';
-import { error, success } from '@mapstore/framework/actions/notifications';
+import { error as errorNotification, success as successNotification } from '@mapstore/framework/actions/notifications';
+import { mapInfoSelector } from '@mapstore/framework/selectors/map';
 
 import {
     creatMapStoreMap,
@@ -31,7 +31,9 @@ import {
     UPDATE_RESOURCE_BEFORE_SAVE,
     saveSuccess,
     saveError,
-    savingResource
+    savingResource, 
+    SAVE_DIRECT_CONTENT, 
+    saveContent
 } from '@js/actions/gnsave';
 import {
     resourceLoading,
@@ -128,36 +130,51 @@ const SaveAPI = {
 };
 
 export const gnSaveContent = (action$, store) =>
-    action$.ofType(SAVE_CONTENT, TOGGLE_CONTROL)
+    action$.ofType(SAVE_CONTENT)
         .switchMap((action) => {
-            const controls = ['save', 'saveAs'];
-            // handle only save and saveAs toggle controls
-            if(action.control && !controls.includes(action.control)) {
-                return Observable.empty();
-            }
             const state = store.getState();
             const contentType = state.gnresource?.type || 'map';
-            const resourceId = action.id || state.gnresource?.data?.pk
-            const metadata = action.metadata || {...state.gnresource?.data, name: state.gnresource?.data?.title,
-                     thumbnail: state.gnresource?.data?.thumbnail_url, description: state.gnresource?.data?.abstract}
-            //  if there is no metadata, shows the user opened the map
-            return !metadata.name ? Observable.empty() : Observable.defer(() => SaveAPI[contentType](state, resourceId, metadata, action.reload))
+            return Observable.defer(() => SaveAPI[contentType](state, action.id, action.metadata, action.reload))
                 .switchMap((response) => {
                     return Observable.of(
                         saveSuccess(response),
                         updateResourceProperties({
-                            'title': metadata?.name,
-                            'abstract': metadata?.description,
-                            'thumbnail_url': metadata?.thumbnail
+                            'title': action.metadata.name,
+                            'abstract': action.metadata.description,
+                            'thumbnail_url': action.metadata.thumbnail
                         }),
-                        success({title: "saveDialog.saveSuccessTitle",  message: "saveDialog.saveSuccessMessage"})
+                        action.showNotifications && successNotification({title: "saveDialog.saveSuccessTitle", message: "saveDialog.saveSuccessMessage"})
                     );
                 })
-                .catch((err) => {
-                    return Observable.of(saveError(err.data && err.data[0] || err.message), error({title: "map.mapError.errorTitle", message: err.data && err.data[0] || err.message || "map.mapError.errorDefault"}));
+                .catch((error) => {
+                    return Observable.of(saveError(error.data || error.message));
                 })
-                .startWith(savingResource());
-        });
+
+        }).startWith(savingResource());;
+
+export const gnSaveDirectContent = (action$, store) =>
+    action$.ofType(SAVE_DIRECT_CONTENT)
+        .switchMap(() => {
+            const state = store.getState();
+            const mapInfo = mapInfoSelector(state);
+            const resourceId = mapInfo.id // injected map id
+            || state?.gnresource?.id; // injected geostory id
+            return Observable.defer(() => getResourceByPk(resourceId))
+                .switchMap((resource) => {
+                    const metadata = {
+                        name: resource.title,
+                        description: resource.abstract,
+                        thumbnail: resource.thumbnail_url
+                    };
+                    return Observable.of(
+                        setResource(resource),
+                        saveContent(resourceId, metadata, false, true /* showNotification */)
+                    );
+                })
+                .catch((error) => {
+                    return Observable.of(saveError(error.data || error.message));
+                });
+        }).startWith(savingResource());
 
 export const gnUpdateResource = (action$, store) =>
     action$.ofType(UPDATE_RESOURCE_BEFORE_SAVE)
@@ -180,5 +197,6 @@ export const gnUpdateResource = (action$, store) =>
 
 export default {
     gnSaveContent,
-    gnUpdateResource
+    gnUpdateResource,
+    gnSaveDirectContent
 };
