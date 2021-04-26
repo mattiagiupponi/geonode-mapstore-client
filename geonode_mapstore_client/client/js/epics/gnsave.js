@@ -150,7 +150,7 @@ export const gnSaveContent = (action$, store) =>
                             'abstract': metadata?.description,
                             'thumbnail_url': metadata?.thumbnail
                         }),
-                        success({title: "map.savedMapTitle",  message: "map.savedMapMessage"})
+                        success({title: "saveDialog.saveSuccessTitle",  message: "saveDialog.saveSuccessMessage"})
                     );
                 })
                 .catch((err) => {
