@@ -44,7 +44,7 @@ describe('gnsave epics', () => {
     it('should create new map with success (gnSaveContent)', (done) => {
         const NUM_ACTIONS = 3;
         const metadata = {
-            title: 'Title',
+            name: 'Title',
             description: 'Description',
             thumbnail: 'thumbnail.jpeg'
         };
@@ -73,7 +73,7 @@ describe('gnsave epics', () => {
         const NUM_ACTIONS = 3;
         const id = 1;
         const metadata = {
-            title: 'Title',
+            name: 'Title',
             description: 'Description',
             thumbnail: 'thumbnail.jpeg'
         };
@@ -101,7 +101,7 @@ describe('gnsave epics', () => {
     it('should save content with error (updateResourceBeforeSave)', (done) => {
         const NUM_ACTIONS = 2;
         const metadata = {
-            title: 'Title',
+            name: 'Title',
             description: 'Description',
             thumbnail: 'thumbnail.jpeg'
         };
