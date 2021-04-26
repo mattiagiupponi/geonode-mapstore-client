@@ -147,7 +147,10 @@ export const gnSaveContent = (action$, store) =>
                     );
                 })
                 .catch((error) => {
-                    return Observable.of(saveError(error.data || error.message));
+                    return Observable.of(
+                        saveError(error.data || error.message),
+                        action.showNotifications && errorNotification({title: "errorTitleDefault", message: "errorDefault"})
+                        );
                 })
 
         }).startWith(savingResource());;
@@ -157,14 +160,14 @@ export const gnSaveDirectContent = (action$, store) =>
         .switchMap(() => {
             const state = store.getState();
             const mapInfo = mapInfoSelector(state);
-            const resourceId = mapInfo.id // injected map id
+            const resourceId = mapInfo?.id // injected map id
             || state?.gnresource?.id; // injected geostory id
             return Observable.defer(() => getResourceByPk(resourceId))
                 .switchMap((resource) => {
                     const metadata = {
-                        name: resource.title,
-                        description: resource.abstract,
-                        thumbnail: resource.thumbnail_url
+                        name: resource?.title,
+                        description: resource?.abstract,
+                        thumbnail: resource?.thumbnail_url
                     };
                     return Observable.of(
                         setResource(resource),
