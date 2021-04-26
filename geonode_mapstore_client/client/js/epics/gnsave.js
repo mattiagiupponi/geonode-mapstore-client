@@ -140,7 +140,6 @@ export const gnSaveContent = (action$, store) =>
             const resourceId = action.id || state.gnresource?.data?.pk
             const metadata = action.metadata || {...state.gnresource?.data, name: state.gnresource?.data?.title,
                      thumbnail: state.gnresource?.data?.thumbnail_url, description: state.gnresource?.data?.abstract}
-            console.log({metadata, action});         
             //  if there is no metadata, shows the user opened the map
             return !metadata.name ? Observable.empty() : Observable.defer(() => SaveAPI[contentType](state, resourceId, metadata, action.reload))
                 .switchMap((response) => {
