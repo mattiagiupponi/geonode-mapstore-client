@@ -44,7 +44,7 @@ describe('gnsave epics', () => {
     it('should create new map with success (gnSaveContent)', (done) => {
         const NUM_ACTIONS = 3;
         const metadata = {
-            name: 'Title',
+            title: 'Title',
             description: 'Description',
             thumbnail: 'thumbnail.jpeg'
         };
@@ -73,15 +73,15 @@ describe('gnsave epics', () => {
         const NUM_ACTIONS = 3;
         const id = 1;
         const metadata = {
-            name: 'Title',
+            title: 'Title',
             description: 'Description',
             thumbnail: 'thumbnail.jpeg'
         };
-        mockAxios.onPatch().reply(() => [200, {}]);
+        mockAxios.onPut().reply(() => [200, {}]);
         testEpic(
             gnSaveContent,
             NUM_ACTIONS,
-            saveContent(id, metadata, false),
+            saveContent(id, metadata, false, false),
             (actions) => {
                 try {
                     expect(actions.map(({ type }) => type))
@@ -101,7 +101,7 @@ describe('gnsave epics', () => {
     it('should save content with error (updateResourceBeforeSave)', (done) => {
         const NUM_ACTIONS = 2;
         const metadata = {
-            name: 'Title',
+            title: 'Title',
             description: 'Description',
             thumbnail: 'thumbnail.jpeg'
         };

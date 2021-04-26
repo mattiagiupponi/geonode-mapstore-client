@@ -16,7 +16,8 @@ import {
 
 function gnsave(state = {}, action) {
     switch (action.type) {
-    case SAVING_RESOURCE, SAVE_DIRECT_CONTENT: {
+    case SAVING_RESOURCE :
+    case SAVE_DIRECT_CONTENT: {
         return {
             saving: true
         };
