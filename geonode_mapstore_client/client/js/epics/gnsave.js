@@ -149,7 +149,7 @@ export const gnSaveContent = (action$, store) =>
                 .catch((error) => {
                     return Observable.of(
                         saveError(error.data || error.message),
-                        action.showNotifications && errorNotification({title: "errorTitleDefault", message: "errorDefault"})
+                        action.showNotifications && errorNotification({title: "map.mapError.errorTitle", message: "map.mapError.errorDefault"})
                         );
                 })
 
@@ -175,7 +175,10 @@ export const gnSaveDirectContent = (action$, store) =>
                     );
                 })
                 .catch((error) => {
-                    return Observable.of(saveError(error.data || error.message));
+                    return Observable.of(
+                        saveError(error.data || error.message),
+                        errorNotification({title: "map.mapError.errorTitle", message: error.data || error.message || "map.mapError.errorDefault"})
+                        );
                 });
         }).startWith(savingResource());
 
