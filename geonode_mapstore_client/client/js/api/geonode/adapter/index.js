@@ -43,7 +43,7 @@ export const creatMapStoreMap = (body = {}) => {
 */
 export const updateMapStoreMap = (id, body = {}) => {
     const { endpointAdapter = '/mapstore/rest' } = getConfigProp('geoNodeApi') || {};
-    return axios.put(parseDevHostname(`${endpointAdapter}/resources/${id}/`),
+    return axios.patch(parseDevHostname(`${endpointAdapter}/resources/${id}/`),
         body,
         {
             params: {

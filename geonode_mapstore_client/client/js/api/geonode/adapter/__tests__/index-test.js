@@ -56,7 +56,7 @@ describe('GeoNode adapter api', () => {
             data: {},
             name: 'Map'
         };
-        mockAxios.onPut(new RegExp(`/mapstore/rest/resources/${id}`))
+        mockAxios.onPatch(new RegExp(`/mapstore/rest/resources/${id}`))
             .reply((config) => {
                 try {
                     expect(config.data).toBe(JSON.stringify(mapConfiguration));
