@@ -29,7 +29,8 @@ let endpoints = {
     'layers': '/api/v2/layers',
     'maps': '/api/v2/maps',
     'geoapps': '/api/v2/geoapps',
-    'geostories': '/api/v2/geostories',
+    'geostories': '/api/v2/geoapps?filter{resource_type.in}=geostory',
+    'dashboards': '/api/v2/geoapps?filter{resource_type.in}=dashboard',
     'users': '/api/v2/users',
     'resource_types': '/api/v2/resources/resource_types',
     'categories': '/api/v2/categories',
@@ -44,6 +45,7 @@ const LAYERS = 'layers';
 const MAPS = 'maps';
 const GEOAPPS = 'geoapps';
 const GEOSTORIES = 'geostories';
+const DASHBOARDS = 'dashboards';
 const USERS = 'users';
 const RESOURCE_TYPES = 'resource_types';
 const OWNERS = 'owners';
@@ -271,43 +273,27 @@ export const createGeoApp = (body) => {
             include: ['data']
         }
     })
-        .then(({ data }) => data.resource);
+        .then(({ data }) => data.geoapp);
 };
 
 export const getGeoAppByPk = (pk) => {
     return axios.get(parseDevHostname(`${endpoints[GEOAPPS]}/${pk}`), {
         params: {
-            full: true
+            full: true,
+            include: ['data']
         }
     })
         .then(({ data }) => data.geoapp);
 };
 
-export const createGeoStory = (body) => {
-    return axios.post(parseDevHostname(`${endpoints[GEOSTORIES]}`), body, {
-        params: {
-            include: ['data']
-        }
-    })
-        .then(({ data }) => data.geostory);
-};
 
-export const getGeoStoryByPk = (pk) => {
-    return axios.get(parseDevHostname(`${endpoints[GEOSTORIES]}/${pk}`), {
+export const updateGeoApp = (pk, body) => {
+    return axios.patch(parseDevHostname(`${endpoints[GEOAPPS]}/${pk}`), body, {
         params: {
             include: ['data']
         }
     })
-        .then(({ data }) => data.geostory);
-};
-
-export const updateGeoStory = (pk, body) => {
-    return axios.patch(parseDevHostname(`${endpoints[GEOSTORIES]}/${pk}`), body, {
-        params: {
-            include: ['data']
-        }
-    })
-        .then(({ data }) => data.geostory);
+        .then(({ data }) => data.geoapp);
 };
 
 export const updateDocument = (pk, body) => {
@@ -423,7 +409,7 @@ export const getResourcesTotalCount = () => {
         LAYERS,
         MAPS,
         GEOSTORIES,
-        GEOAPPS
+        DASHBOARDS
     ];
     return axios.all(
         types.map((type) =>
@@ -437,14 +423,14 @@ export const getResourcesTotalCount = () => {
             layersTotalCount,
             mapsTotalCount,
             geostoriesTotalCount,
-            geoappsTotalCount
+            dashboardsTotalCount
         ]) => {
             return {
                 documentsTotalCount,
                 layersTotalCount,
                 mapsTotalCount,
                 geostoriesTotalCount,
-                geoappsTotalCount
+                dashboardsTotalCount
             };
         });
 };
@@ -522,7 +508,7 @@ export const getCategories = ({ q, idIn, ...params }, filterKey = 'categories') 
                 .map((result) => {
                     const selectOption = {
                         value: result.identifier,
-                        label: addCountToLabel(result.gn_description || result.gn_description_en, result.count)
+                        label: addCountToLabel(result.gn_description || result.gn_description_en, result.total)
                     };
                     const category = {
                         ...result,
@@ -549,7 +535,7 @@ export const getRegions = ({ q, idIn, ...params }, filterKey = 'regions') => {
                 .map((result) => {
                     const selectOption = {
                         value: result.name,
-                        label: addCountToLabel(result.name, result.count)
+                        label: addCountToLabel(result.name, result.total)
                     };
                     const region = {
                         ...result,
@@ -576,7 +562,7 @@ export const getOwners = ({ q, idIn, ...params }, filterKey = 'owners') => {
                 .map((result) => {
                     const selectOption = {
                         value: result.username,
-                        label: addCountToLabel(result.username, result.count)
+                        label: addCountToLabel(result.username, result.total)
                     };
                     const owner = {
                         ...result,
@@ -601,10 +587,9 @@ export const getKeywords = ({ q, idIn, ...params }, filterKey =  'keywords') => 
         .then(({ data }) => {
             const results = (data?.HierarchicalKeywords || [])
                 .map((result) => {
-
                     const selectOption = {
                         value: result.slug,
-                        label: addCountToLabel(result.slug, result.count)
+                        label: addCountToLabel(result.slug, result.total)
                     };
                     const keyword = {
                         ...result,
@@ -622,9 +607,7 @@ export default {
     getResourceByPk,
     createGeoApp,
     getGeoAppByPk,
-    createGeoStory,
-    getGeoStoryByPk,
-    updateGeoStory,
+    updateGeoApp,
     getMaps,
     getDocumentsByDocType,
     getUserByPk,
