@@ -8,9 +8,9 @@
 
 import { connect } from 'react-redux';
 import main from '@mapstore/framework/components/app/main';
-import MainLoader from '@js/components/app/MainLoader';
+import MainLoader from '@js/components/MainLoader';
 import GeoStory from '@js/routes/GeoStory';
-import Router, { withRoutes } from '@js/components/app/Router';
+import Router, { withRoutes } from '@js/components/Router';
 import security from '@mapstore/framework/reducers/security';
 import maptype from '@mapstore/framework/reducers/maptype';
 import geostory from '@mapstore/framework/reducers/geostory';
@@ -20,7 +20,7 @@ import { registerMediaAPI } from '@mapstore/framework/api/media';
 import * as geoNodeMediaApi from '@js/observables/media/geonode';
 import {
     getEndpoints,
-    getConfiguration
+    getConfiguration, getAccountInfo
 } from '@js/api/geonode/v2';
 import {
     setResourceType,
@@ -110,9 +110,10 @@ initializeApp();
 document.addEventListener('DOMContentLoaded', function() {
     Promise.all([
         getConfiguration(),
+        getAccountInfo(),
         getEndpoints()
     ])
-        .then(([localConfig]) => {
+        .then(([localConfig, user]) => {
             const {
                 securityState,
                 geoNodeConfiguration,
@@ -124,7 +125,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 onStoreInit,
                 targetId = 'ms-container',
                 settings
-            } = setupConfiguration({ localConfig });
+            } = setupConfiguration({ localConfig, user });
 
             const currentStory = geoNodePageConfig.isNewResource
                 // change id of new story sections and contents

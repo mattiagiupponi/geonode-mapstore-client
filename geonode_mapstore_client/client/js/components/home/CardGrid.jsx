@@ -7,12 +7,13 @@
  */
 
 import React, { useEffect, useRef } from 'react';
-import { Spinner } from 'react-bootstrap-v1';
+import Spinner from '@js/components/Spinner';
 import HTML from '@mapstore/framework/components/I18N/HTML';
 import FaIcon from '@js/components/home/FaIcon';
 import ResourceCard from '@js/components/home/ResourceCard';
 import { withResizeDetector } from 'react-resize-detector';
 import useLocalStorage from '@js/hooks/useLocalStorage';
+import { hasPermissionsTo } from '@js/utils/MenuUtils';
 
 const Cards = withResizeDetector(({
     resources,
@@ -20,7 +21,8 @@ const Cards = withResizeDetector(({
     isCardActive,
     containerWidth,
     width: detectedWidth,
-    links
+    buildHrefByTemplate,
+    options
 }) => {
 
     const width = containerWidth || detectedWidth;
@@ -57,7 +59,7 @@ const Cards = withResizeDetector(({
     };
 
 
-    const layoutSpace = (cardLayoutStyle, idx) => {
+    const layoutSpace = (idx) => {
         let cardContainerSpace;
         switch (cardLayoutStyle) {
         case 'list':
@@ -69,29 +71,34 @@ const Cards = withResizeDetector(({
         return cardContainerSpace;
     };
 
-
+    const containerStyle = isSingleCard
+        ? {
+            paddingBottom: margin
+        }
+        : {
+            paddingLeft: ulPadding,
+            paddingBottom: margin
+        };
     return (
         <ul
-            style={isSingleCard
-                ? {
-                    paddingBottom: margin
-                }
-                : {
-                    paddingLeft: ulPadding,
-                    paddingBottom: margin
-                }}
+            style={cardLayoutStyle === 'list' ? {} : containerStyle}
         >
             {resources.map((resource, idx) => {
+
+                const allowedOptions = options
+                    .filter((opt) => hasPermissionsTo(resource?.perms, opt?.perms, 'resource'));
+
                 return (
                     <li
                         key={resource.pk}
-                        style={(layoutSpace(cardLayoutStyle, idx))}
+                        style={(layoutSpace(idx))}
                     >
                         <ResourceCard
                             active={isCardActive(resource)}
                             data={resource}
                             formatHref={formatHref}
-                            links={links}
+                            options={allowedOptions}
+                            buildHrefByTemplate={buildHrefByTemplate}
                             layoutCardsStyle={cardLayoutStyle}
                         />
                     </li>
@@ -111,13 +118,14 @@ const CardGrid = withResizeDetector(({
     isCardActive,
     containerStyle,
     header,
-    cardLinks,
+    cardOptions,
     column,
     isColumnActive,
     messageId,
     children,
     pageSize,
-    width
+    width,
+    buildHrefByTemplate
 }) => {
 
     const columnNode = useRef();
@@ -175,8 +183,9 @@ const CardGrid = withResizeDetector(({
                             resources={resources}
                             formatHref={formatHref}
                             isCardActive={isCardActive}
-                            links={cardLinks}
+                            options={cardOptions}
                             containerWidth={pageSize === 'md' && isColumnActive ? width - columnWidth : undefined}
+                            buildHrefByTemplate={buildHrefByTemplate}
                         />
                         <div className="gn-card-grid-pagination">
                             {loading && <Spinner animation="border" role="status">

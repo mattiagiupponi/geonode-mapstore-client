@@ -7,8 +7,9 @@
  */
 
 import React, { forwardRef } from 'react';
-import { Dropdown, Button } from 'react-bootstrap-v1';
-import ReactResizeDetector from 'react-resize-detector';
+import Dropdown from '@js/components/Dropdown';
+import Button from '@js/components/Button';
+import Badge from '@js/components/Badge';
 import Message from '@mapstore/framework/components/I18N/Message';
 import FaIcon from '@js/components/home/FaIcon';
 import useLocalStorage from '@js/hooks/useLocalStorage';
@@ -19,16 +20,20 @@ const FiltersMenu = forwardRef(({
     orderOptions,
     order,
     cardsMenu,
-    filters,
     style,
     onClick,
-    layoutSwitcher,
-    defaultLabelId
+    defaultLabelId,
+    onClear,
+    totalResources,
+    totalFilters,
+    filtersActive
 }, ref) => {
 
     const selectedSort = orderOptions.find(({ value }) => order === value);
-    const [cardLayoutStyle] = useLocalStorage('layoutCardsStyle');
-
+    const [cardLayoutStyle, setCardLayoutStyle] = useLocalStorage('layoutCardsStyle', 'grid');
+    function handleToggleCardLayoutStyle() {
+        setCardLayoutStyle(cardLayoutStyle === 'grid' ? 'list' : 'grid');
+    }
     return (
         <div
             className="gn-filters-menu"
@@ -36,36 +41,45 @@ const FiltersMenu = forwardRef(({
             ref={ref}
         >
             <div className="gn-filters-menu-container">
-                <a className="gn-toogle-filter" onClick={onClick} > <Message msgId="gnhome.filters" /> {`(${filters.length})`}</a>
-                <ReactResizeDetector handleHeight>
-                    {({ height }) => (
-                        <div
-                            className="gn-filters-menu-content"
-                            style={{ height }}
-                        >
-                        </div>
-                    )}
-                </ReactResizeDetector>
+                <div className="gn-filters-menu-main">
+                    <Button
+                        variant={filtersActive ? 'primary' : 'default'}
+                        size="sm"
+                        onClick={onClick}
+                    >
+                        <Message msgId="gnhome.filtersCount" msgParams={{ count: totalFilters }} />
+                    </Button>
+                    {filtersActive && <Button
+                        variant="default"
+                        size="sm"
+                        onClick={onClear}
+                    >
+                        <Message msgId="gnhome.clearFilters"/>
+                    </Button>}
+                    {' '}
+                    <Badge><Message msgId="gnhome.resourcesFound" msgParams={{ count: totalResources }}/></Badge>
+                </div>
                 <Menu
                     items={cardsMenu}
                     containerClass={`gn-cards-menu`}
-
+                    size="sm"
+                    alignRight
                 />
-
-                <Button variant="default" onClick={layoutSwitcher} >
-                    <FaIcon name={cardLayoutStyle === 'grid' ? 'th' : cardLayoutStyle} />
-                </Button>
-
-                <div
-                    className="gn-filters-menu-tools"
-
+                <Button
+                    variant="default"
+                    onClick={handleToggleCardLayoutStyle}
+                    size="sm"
                 >
+                    <FaIcon name={cardLayoutStyle === 'grid' ? 'list' : 'th'} />
+                </Button>
+                <div className="gn-filters-menu-tools">
 
-                    {orderOptions.length > 0 && <Dropdown alignRight>
+                    {orderOptions.length > 0 && <Dropdown pullRight>
                         <Dropdown.Toggle
                             id="sort-dropdown"
-                            variant="default"
-                            size="sm"
+                            bsStyle="default"
+                            bsSize="sm"
+                            noCaret
                         >
                             <Message msgId={selectedSort?.labelId || defaultLabelId} />
                         </Dropdown.Toggle>

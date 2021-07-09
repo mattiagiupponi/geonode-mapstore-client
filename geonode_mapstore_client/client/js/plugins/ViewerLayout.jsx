@@ -6,21 +6,51 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import React, { memo } from 'react';
+import React, { memo, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 import isEqual from 'lodash/isEqual';
+import { resizeMap } from '@mapstore/framework/actions/map';
 import { createPlugin } from '@mapstore/framework/utils/PluginsUtils';
 import usePluginItems from '@js/hooks/usePluginItems';
+import { getResourceId } from '@js/selectors/gnresource';
+import { withResizeDetector } from 'react-resize-detector';
 
+// ensure the map trigger the force update/resize
+// when the center container change size
+function Center({
+    configuredItems,
+    width,
+    onResize
+}) {
+    useEffect(() => {
+        onResize();
+    }, [width]);
+    return (
+        <>
+            {configuredItems
+                .filter(({ target }) => !target)
+                .map(({ Component, name }) => <Component key={name} />)}
+        </>
+    );
+}
+
+const ConnectedCenter = connect(
+    createSelector([], () => ({})),
+    {
+        onResize: resizeMap
+    }
+)(withResizeDetector(Center));
 function ViewerLayout({
-    items
+    items,
+    resourcePk
 }, context) {
     const { loadedPlugins } = context;
-    const configuredItems = usePluginItems({ items, loadedPlugins });
+    const configuredItems = usePluginItems({ items, loadedPlugins }, [resourcePk]);
     return (
         <div
+            className="gn-viewer-layout"
             style={{
                 position: 'fixed',
                 top: 0,
@@ -36,14 +66,32 @@ function ViewerLayout({
                     .map(({ Component, name }) => <Component key={name} />)}
             </header>
             <div
+                className="gn-viewer-layout-body"
                 style={{
+                    display: 'flex',
+                    width: '100%',
                     flex: 1,
                     position: 'relative'
-                }}
-            >
-                {configuredItems
-                    .filter(({ target }) => !target)
-                    .map(({ Component, name }) => <Component key={name} />)}
+                }}>
+                <div className="gn-viewer-left-column">
+                    {configuredItems
+                        .filter(({ target }) => target === 'leftColumn')
+                        .map(({ Component, name }) => <Component key={name} />)}
+                </div>
+                <div
+                    className="gn-viewer-layout-center"
+                    style={{
+                        flex: 1,
+                        position: 'relative'
+                    }}
+                >
+                    <ConnectedCenter configuredItems={configuredItems}/>
+                </div>
+                <div className="gn-viewer-right-column">
+                    {configuredItems
+                        .filter(({ target }) => target === 'rightColumn')
+                        .map(({ Component, name }) => <Component key={name} />)}
+                </div>
             </div>
             <footer>
                 {configuredItems
@@ -65,7 +113,11 @@ function arePropsEqual(prevProps, nextProps) {
 const MemoizeViewerLayout = memo(ViewerLayout, arePropsEqual);
 
 const ViewerLayoutPlugin = connect(
-    createSelector([], () => ({})),
+    createSelector([
+        getResourceId
+    ], (resourcePk) => ({
+        resourcePk
+    })),
     {}
 )(MemoizeViewerLayout);
 

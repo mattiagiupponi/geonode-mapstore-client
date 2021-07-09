@@ -16,24 +16,27 @@ import { loadLocale } from '@mapstore/framework/actions/locale';
 import { currentLocaleSelector } from '@mapstore/framework/selectors/locale';
 import SearchBar from '@js/components/home/SearchBar';
 import BrandNavbar from '@js/components/home/BrandNavbar';
+import ActionNavBar from '@js/components/ActionNavbar';
 import Hero from '@js/components/home/Hero';
-import MenuIndex from '@js/components/home/MenuIndex';
 import CardGrid from '@js/components/home/CardGrid';
 import DetailsPanel from '@js/components/home/DetailsPanel';
 import FiltersMenu from '@js/components/home/FiltersMenu';
-import FilterForm from '@js/components/home/FilterForm';
+import FiltersForm from '@js/components/FiltersForm';
+import FeaturedList from '@js/components/home/FeaturedList';
 import LanguageSelector from '@js/components/home/LanguageSelector';
-import { getMonitoredState, handleExpression } from '@mapstore/framework/utils/PluginsUtils';
-import { getConfigProp } from "@mapstore/framework/utils/ConfigUtils";
-import { filterMenuItems, mapObjectFunc, reduceArrayRecursive } from '@js/utils/MenuUtils';
-
-import get from 'lodash/get';
+import { getParsedGeoNodeConfiguration } from "@js/selectors/config";
+import { userSelector } from '@mapstore/framework/selectors/security';
+import { buildHrefByTemplate } from '@js/utils/MenuUtils';
+import { setControlProperty } from '@mapstore/framework/actions/controls';
 import {
     fetchSuggestions,
     searchResources,
     requestResource,
-    updateSuggestions
+    updateSuggestions,
+    loadFeaturedResources
 } from '@js/actions/gnsearch';
+
+import { setFavoriteResource } from '@js/actions/gnresource';
 
 import {
     hashLocationToHref,
@@ -42,20 +45,16 @@ import {
 import { withResizeDetector } from 'react-resize-detector';
 import Footer from '@js/components/home/Footer';
 import { useInView } from 'react-intersection-observer';
-import {
-    getKeywords,
-    getCategories,
-    getRegions,
-    getOwners
-} from '@js/api/geonode/v1';
-import { getResourceTypes } from '@js/api/geonode/v2';
-import useLocalStorage from '@js/hooks/useLocalStorage';
-import  { toggleFiltersPanel }  from '@js/actions/gnfiltersPanel';
 
+import { getResourceTypes, getCategories, getRegions, getOwners, getKeywords } from '@js/api/geonode/v2';
+import MetaTags from "@js/components/MetaTags";
+
+import {
+    getPageSize
+} from '@js/utils/AppUtils';
 
 const DEFAULT_SUGGESTIONS = [];
 const DEFAULT_RESOURCES = [];
-const REDIRECT_NOT_ALLOWED = ['/', '/search/'];
 const ConnectedLanguageSelector = connect(
     createSelector([
         currentLocaleSelector
@@ -81,19 +80,6 @@ const ConnectedSearchBar = connect(
     }
 )(SearchBar);
 
-
-const ConnectedFilterForm = connect(
-    createSelector([
-        state => state?.gnfiltersPanel?.isToggle || false
-    ], (isToggle) => ({
-        isToggle
-    })),
-    {
-        onToggleFilters: toggleFiltersPanel
-    }
-)(FilterForm);
-
-
 const CardGridWithMessageId = ({ query, user, isFirstRequest, ...props }) => {
     const hasResources = props.resources?.length > 0;
     const hasFilter = Object.keys(query || {}).filter(key => key !== 'sort').length > 0;
@@ -103,7 +89,7 @@ const CardGridWithMessageId = ({ query, user, isFirstRequest, ...props }) => {
             || isLoggedIn && 'noContentYet'
             || 'noPublicContent'
         : undefined;
-    return <CardGrid { ...props } messageId={messageId}/>;
+    return <CardGrid { ...props } messageId={messageId}  />;
 };
 
 const ConnectedCardGrid = connect(
@@ -120,13 +106,30 @@ const ConnectedCardGrid = connect(
     }))
 )(CardGridWithMessageId);
 
+const ConnectedFeatureList = connect(
+    createSelector([
+        state => state?.gnsearch?.featuredResources?.resources || DEFAULT_RESOURCES,
+        state => state?.gnsearch?.featuredResources?.page || 1,
+        state => state?.gnsearch?.featuredResources?.isNextPageAvailable || false,
+        state => state?.gnsearch?.featuredResources?.isPreviousPageAvailable || false,
+        state => state?.gnsearch?.featuredResources?.loading || false
+    ], (resources, page, isNextPageAvailable, isPreviousPageAvailable, loading) => ({
+        resources, page, isNextPageAvailable, isPreviousPageAvailable, loading})
+    ), {loadFeaturedResources}
+)(FeaturedList);
+
 
 const ConnectedDetailsPanel = connect(
     createSelector([
-        state => state?.gnresource?.loading || false
-    ], (loading) => ({
-        loading
-    }))
+        state => state?.gnresource?.loading || false,
+        state => state?.gnresource?.data?.favorite || false
+    ], (loading, favorite) => ({
+        loading,
+        favorite
+    })),
+    {
+        onFavorite: setFavoriteResource
+    }
 )(DetailsPanel);
 
 const suggestionsRequestTypes = {
@@ -177,37 +180,41 @@ const suggestionsRequestTypes = {
     }
 };
 
-function getPageSize(width) {
-    if (width < 968) {
-        return 'sm';
-    }
-    if (width < 1400) {
-        return 'md';
-    }
-    return 'lg';
-}
-
 function Home({
     location,
-    theme,
     params,
     onSearch,
-    onToggleFilters,
-    isToggle,
-    monitoredUserState,
-    geoNodeConfiguration,
-    navbar,
+    onEnableFiltersPanel,
+    isFiltersPanelEnabled,
+    config,
     hideHero,
     isFilterForm,
     onSelect,
     match,
-    filters,
     user,
     width,
-    resource
+    resource,
+    totalResources,
+    disableFeatured = false,
+    fetchFeaturedResources = () => {},
+    siteName
 }) {
+
+    const {
+        menuItemsLeftAllowed,
+        menuItemsRightAllowed,
+        navbarItemsAllowed,
+        filterMenuItemsAllowed,
+        footerMenuItemsAllowed,
+        cardOptionsItemsAllowed,
+        filtersFormItemsAllowed,
+        theme,
+        filters,
+        menu: {cfg: actionNavbarCfg} = {}
+    } = config;
     const pageSize = getPageSize(width);
     const isMounted = useRef();
+
     useEffect(() => {
         isMounted.current = true;
         return () => {
@@ -216,7 +223,7 @@ function Home({
     }, []);
 
     const brandNavbarNode = useRef();
-    const menuIndexNode = useRef();
+    const actionNavbarNode = useRef();
     const filtersMenuNode = useRef();
     const footerNode = useRef();
     const filterFormNode = useRef();
@@ -229,8 +236,8 @@ function Home({
         ? brandNavbarNode.current.getBoundingClientRect().height
         : 0;
 
-    const menuIndexNodeHeight = menuIndexNode.current
-        ? menuIndexNode.current.getBoundingClientRect().height
+    const actionNavbarNodeHeight = actionNavbarNode.current
+        ? actionNavbarNode.current.getBoundingClientRect().height
         : 0;
     const filtersMenuNodeHeight = filtersMenuNode.current
         ? filtersMenuNode.current.getBoundingClientRect().height
@@ -243,43 +250,28 @@ function Home({
         ? heroNode.current.getBoundingClientRect().height
         : 0;
 
-    const filterFormOffset = filterFormNode.current
-        ? filterFormNode?.current?.offsetTop
-        : 0;
-
 
     const dimensions = {
         brandNavbarHeight,
-        menuIndexNodeHeight,
+        actionNavbarNodeHeight,
         filtersMenuNodeHeight,
         footerNodeHeight,
         heroNodeHeight
     };
 
-
-    const getMonitorState = (path) => {
-        return get(monitoredUserState, path);
-    };
-
-
-    const [cardLayoutStyle, setCardLayoutStyle] = useLocalStorage('layoutCardsStyle');
-    const [showFilterForm, setShowFilterForm] = useState( (isFilterForm && isToggle) || false);
+    const [isSmallDevice, setIsSmallDevice] = useState(false);
+    useEffect(() => {
+        setIsSmallDevice((pageSize === 'sm') ? true : false);
+    }, [pageSize]);
 
     const handleShowFilterForm = () => {
-        if (!REDIRECT_NOT_ALLOWED.includes(location.pathname)) {
+        if (!isFilterForm) {
             window.location = `#/search/${location.search}`;
-            return;
+            onEnableFiltersPanel(true);
+        } else {
+            onEnableFiltersPanel(!isFiltersPanelEnabled);
         }
-        setShowFilterForm(!showFilterForm);
-        onToggleFilters();
-
     };
-
-    const handleStoredLayoutStyle = () => {
-        let styleCard = cardLayoutStyle === 'grid' ? 'list' : 'grid';
-        setCardLayoutStyle(styleCard);
-    };
-
 
     function handleUpdate(newParams, pathname) {
         const { query } = url.parse(location.search, true);
@@ -288,18 +280,29 @@ function Home({
             ...params,
             ...newParams
         }, pathname);
+
     }
+    // to update the overlay form in mobile device, after apply,
+    // the form has to close
+    const handleUpdateSmallDevice = (newParams, pathname) => {
+        handleUpdate(newParams, pathname);
+        handleShowFilterForm();
+    };
+    const [formParams, setFormParams] = useState({});
 
     function handleClear() {
         const { query } = url.parse(location.search, true);
         const newParams = Object.keys(query)
             .reduce((acc, key) =>
                 key.indexOf('filter') === 0
+                || key === 'f'
                     ? {
                         ...acc,
                         [key]: []
                     }
                     : acc, { extent: undefined });
+
+        setFormParams(newParams);
         handleUpdate(newParams);
     }
 
@@ -310,13 +313,17 @@ function Home({
         });
     }
 
+    function hrefDetailPanel() {
+        return handleFormatHref({
+            pathname: '/search/'
+        });
+    }
+
 
     const { query } = url.parse(location.search, true);
-
-    const queryFilters = Object.keys(query).reduce((acc, key) => key.indexOf('filter') === 0
-        ? [...acc, ...castArray(query[key]).map((value) => ({ key, value }))]
-        : acc, []);
-
+    const queryFilters = Object.keys(query).reduce((acc, key) => key.indexOf('sort') === 0
+        ? acc
+        : [...acc, ...castArray(query[key]).map((value) => ({ key, value }))], []);
 
     const pk = match.params.pk;
     const ctype = match.params.ctype;
@@ -360,16 +367,6 @@ function Home({
 
     }, []);
 
-    const userState = {
-        user
-    };
-    const confWithHandleExpression = mapObjectFunc(v => handleExpression(getMonitorState, {}, v))(geoNodeConfiguration);
-    const menuItemsLeftAllowed = reduceArrayRecursive(confWithHandleExpression?.menu?.items, (item) => filterMenuItems(userState, item));
-    const menuItemsRightAllowed = reduceArrayRecursive(confWithHandleExpression?.menu?.rightItems, (item) => filterMenuItems(userState, item));
-    const navebarItemsAllowed = reduceArrayRecursive(confWithHandleExpression?.navbar?.items, (item) => filterMenuItems(userState, item));
-    const filterMenuItemsAllowed = reduceArrayRecursive(confWithHandleExpression?.cardsMenu?.items, (item) => filterMenuItems(userState, item));
-    const footerMenuItemsAllowed = reduceArrayRecursive(confWithHandleExpression?.footer?.items, (item) => filterMenuItems(userState, item));
-
     const search = (
         <ConnectedSearchBar
             key="search"
@@ -388,17 +385,25 @@ function Home({
     );
 
     const isHeroVisible = !hideHero && inView;
-    const stickyFiltersMaxHeight = (window.innerHeight - dimensions.brandNavbarHeight - dimensions.menuIndexNodeHeight - dimensions.footerNodeHeight);
+    const stickyFiltersMaxHeight = (window.innerHeight - dimensions.brandNavbarHeight - dimensions.actionNavbarNodeHeight - dimensions.footerNodeHeight);
+    const filterFormTop = dimensions.brandNavbarHeight + dimensions.actionNavbarNodeHeight;
     return (
-        <div className={`gn-home gn-theme-${theme?.variant || 'light'}`}>
+        <div className={`gn-home`}>
+            <MetaTags
+                logo={resource ? resource.thumbnail_url : window.location.origin + config?.navbar?.logo[0]?.src}
+                title={(resource?.title) ? resource?.title + " - " + siteName : siteName }
+                siteName={siteName}
+                contentURL={resource?.detail_url}
+                content={resource?.abstract}
+            />
             <BrandNavbar
                 ref={brandNavbarNode}
-                logo={castArray(navbar?.logo || [])
+                logo={castArray(config?.navbar?.logo || [])
                     .map((logo) => ({
                         ...logo,
                         ...logo[pageSize]
                     }))}
-                navItems={navebarItemsAllowed}
+                navItems={navbarItemsAllowed}
                 inline={pageSize !== 'sm'}
                 pageSize={pageSize}
                 style={{
@@ -420,13 +425,14 @@ function Home({
                     {isHeroVisible && search}
                 </div>
             </Hero>}
-            <MenuIndex
-                ref={menuIndexNode}
+            <ActionNavBar
+                ref={actionNavbarNode}
                 style={{
-                    top: dimensions.brandNavbarHeight,
-                    width
+                    top: dimensions.brandNavbarHeight
+
                 }}
-                getMonitorState={getMonitorState}
+                cfg={actionNavbarCfg}
+                screen={width}
                 query={query}
                 leftItems={menuItemsLeftAllowed || []}
                 rightItems={menuItemsRightAllowed || []}
@@ -435,25 +441,40 @@ function Home({
                     inline={theme?.languageSelector?.inline}
                     style={theme?.languageSelector?.style}
                 />}
+
             />
             <div className="gn-main-home">
 
                 <div className="gn-container">
+                    <div className="gn-row gn-home-section">
+                        <div className="gn-grid-container">
+                            {!disableFeatured &&  <ConnectedFeatureList
+                                query={query}
+                                formatHref={handleFormatHref}
+                                buildHrefByTemplate={buildHrefByTemplate}
+                                onLoad={fetchFeaturedResources}
+                                containerStyle={{
+                                    minHeight: 'auto'
+                                }}/> }
+
+                        </div>
+                    </div>
                     <div className="gn-row">
-                        {showFilterForm && <div ref={filterFormNode} id="gn-filter-form-container" className={`gn-filter-form-container`}>
-                            <ConnectedFilterForm
+                        {isMounted.current && isFiltersPanelEnabled && isFilterForm &&  <div ref={filterFormNode} id="gn-filter-form-container" className={`gn-filter-form-container`}>
+                            <FiltersForm
                                 key="gn-filter-form"
                                 id="gn-filter-form"
-                                styleContanierForm={ hideHero ? { marginTop: dimensions.brandNavbarHeight, top: (filterFormOffset + dimensions.brandNavbarHeight), maxHeight: stickyFiltersMaxHeight } :
-                                    { top: (filterFormOffset - dimensions.heroNodeHeight), maxHeight: stickyFiltersMaxHeight }}
-                                show
-                                fields={filters?.fields?.options}
-                                links={filters?.fields?.links}
+                                styleContainerForm={ hideHero ? { marginTop: dimensions.brandNavbarHeight, top: filterFormTop, maxHeight: stickyFiltersMaxHeight } :
+                                    { top: filterFormTop, maxHeight: stickyFiltersMaxHeight }}
+                                fields={filtersFormItemsAllowed}
                                 extentProps={filters?.extent}
                                 suggestionsRequestTypes={suggestionsRequestTypes}
                                 query={query}
-                                onChange={handleUpdate}
+                                onChange={isSmallDevice && handleUpdateSmallDevice || handleUpdate}
                                 onClose={handleShowFilterForm}
+                                onClear={handleClear}
+                                submitOnChangeField={!isSmallDevice}
+                                formParams={formParams}
                             />
 
                         </div>
@@ -464,34 +485,36 @@ function Home({
                                 user={user}
                                 query={query}
                                 pageSize={pageSize}
+                                cardOptions={cardOptionsItemsAllowed}
                                 isColumnActive={!!resource}
+                                buildHrefByTemplate={buildHrefByTemplate}
                                 containerStyle={!isHeroVisible
                                     ? {
                                         marginTop: hideHero && dimensions.brandNavbarHeight,
-                                        minHeight: `calc(100vh - ${dimensions.brandNavbarHeight + dimensions.menuIndexNodeHeight + dimensions.footerNodeHeight}px )`,
                                         paddingBottom: dimensions.footerNodeHeight
                                     }
                                     : undefined}
                                 column={ hideHero &&
-                    <ConnectedDetailsPanel
-                        resource={resource}
-                        filters={queryFilters}
-                        formatHref={handleFormatHref}
-                        sectionStyle={{
-                            width: pageSize === 'lg'
-                                ? 700
-                                : pageSize === 'md'
-                                    ? 600
-                                    : '100%',
-                            ...(!isHeroVisible && {
-                                position: 'fixed',
-                                top: dimensions.brandNavbarHeight + dimensions.menuIndexNodeHeight,
-                                bottom: dimensions.footerNodeHeight,
-                                overflowY: 'scroll',
-                                height: 'auto'
-                            })
-                        }}
-                    />
+                                    <ConnectedDetailsPanel
+                                        enableFavorite={!!user}
+                                        resource={resource}
+                                        linkHref={hrefDetailPanel}
+                                        formatHref={handleFormatHref}
+                                        sectionStyle={{
+                                            width: pageSize === 'lg'
+                                                ? 700
+                                                : pageSize === 'md'
+                                                    ? 600
+                                                    : '100%',
+                                            ...(!isHeroVisible && {
+                                                position: 'fixed',
+                                                top: dimensions.brandNavbarHeight + dimensions.actionNavbarNodeHeight,
+                                                bottom: dimensions.footerNodeHeight,
+                                                overflowY: 'scroll',
+                                                height: 'auto'
+                                            })
+                                        }}
+                                    />
                                 }
                                 isCardActive={res => res.pk === pk}
                                 page={params.page ? parseFloat(params.page) : 1}
@@ -506,25 +529,24 @@ function Home({
                                 <FiltersMenu
                                     ref={filtersMenuNode}
                                     style={{
-                                        top: dimensions.brandNavbarHeight + dimensions.menuIndexNodeHeight
+                                        top: dimensions.brandNavbarHeight + dimensions.actionNavbarNodeHeight
                                     }}
                                     formatHref={handleFormatHref}
                                     cardsMenu={filterMenuItemsAllowed || []}
                                     order={query?.sort}
-                                    filters={queryFilters}
                                     onClear={handleClear}
                                     onClick={handleShowFilterForm}
-                                    layoutSwitcher={handleStoredLayoutStyle}
                                     orderOptions={filters?.order?.options}
                                     defaultLabelId={filters?.order?.defaultLabelId}
+                                    totalResources={totalResources}
+                                    totalFilters={queryFilters.length}
+                                    filtersActive={!!(queryFilters.length > 0)}
                                 />
 
                             </ConnectedCardGrid>
                         </div>
                     </div>
                 </div>
-
-
             </div>
             <Footer
                 ref={footerNode}
@@ -550,7 +572,8 @@ Home.propTypes = {
 Home.defaultProps = {
     background: {},
     logo: [],
-    jumbotron: {}
+    jumbotron: {},
+    isFilterForm: false
 };
 
 const DEFAULT_PARAMS = {};
@@ -560,21 +583,26 @@ const ConnectedHome = connect(
 
     createSelector([
         state => state?.gnsearch?.params || DEFAULT_PARAMS,
-        state => state?.security?.user || null,
+        userSelector,
         state => state?.gnresource?.data || null,
-        state => state?.gnfiltersPanel?.isToggle || false,
-        state => getMonitoredState(state, getConfigProp('monitorState'))
-    ], (params, user, resource, isToggle, monitoredUserState) => ({
+        state => state?.controls?.gnFiltersPanel?.enabled || null,
+        getParsedGeoNodeConfiguration,
+        state => state?.gnsearch?.total || 0,
+        state => state?.localConfig?.siteName || "Geonode"
+    ], (params, user, resource, isFiltersPanelEnabled, config, totalResources, siteName) => ({
         params,
         user,
         resource,
-        isToggle,
-        monitoredUserState
+        isFiltersPanelEnabled,
+        config,
+        totalResources,
+        siteName
     })),
     {
         onSearch: searchResources,
         onSelect: requestResource,
-        onToggleFilters: toggleFiltersPanel
+        onEnableFiltersPanel: setControlProperty.bind(null, 'gnFiltersPanel', 'enabled'),
+        fetchFeaturedResources: loadFeaturedResources
     }
 )(withResizeDetector(Home));
 

@@ -24,19 +24,23 @@
             "zA": "Z A",
             "mostPopular": "Les plus populaires",
             "data": "Données",
-            "layers": "Couches",
+            "layer": "Dataset",
+            "layers": "Datasets",
+            "document": "Document",
             "documents": "Documents",
             "remoteServices": "Services à distance",
             "maps": "Cartes",
             "map": "Carte",
             "geostory": "GeoStory",
+            "geostories": "GeoStories",
+            "createGeostory": "Créer une geostory",
             "createNew": "Créer un nouveau",
             "about": "À propos",
             "people": "Personnes",
             "groups": "Groupe",
             "groupsCategories": "Catégories de groupe",
             "view": "Voir",
-            "viewLayer": "Visualiser la couche",
+            "viewLayer": "Visualiser dataset",
             "viewMap": "Voir la carte",
             "viewGeoStory": "Voir la GeoStory",
             "viewDocument": "Voir document",
@@ -51,11 +55,13 @@
             "noPublicContentContent": "Ce catalogue ne contient pas de ressources publiques. <br/> Veuillez vous <a href=\"/account/signup/?next=/\"> vous inscrire </a> ou <a href=\"/account/login/?next=/\"> vous connecter </a> pour parcourir le contenu. ",
             "noContentYetTitle": "Bienvenue dans GeoNode",
             "noContentYetContent": "Ce catalogue n'a pas encore de contenu publié. <br/> Nous travaillons à le remplir avec d'excellentes ressources. <br/> <br/> Restez à l'écoute!",
+            "resourcesFound": "{count, plural, =0 {0 Ressources trouvées} =1 {1 Ressource trouvée} other {# Ressources trouvées}}",
             "noResultsWithFilterTitle": "Aucun résultat",
             "noResultsWithFilterContent": "Il n'y a pas de résultats pour les filtres sélectionnés. <br/> Effacez tous les filtres et essayez avec une nouvelle requête.",
             "register": "S'inscrire",
             "signIn": "Connexion",
             "filters": "Filtres",
+            "filtersCount": "{count, plural, =0 { Filtres } other {Filtres (#)}}",
             "admin": "Administration",
             "logOut": "Se déconnecter",
             "terms": "Terms",
@@ -82,12 +88,13 @@
             "inbox": "Boîte de réception",
             "geoServer": "GeoServer",
             "help": "Aide",
-            "uploadLayer": "Téléchargez la couche",
+            "uploadLayer": "Téléchargez dataset",
             "uploadDocument": "Télécharger un document",
             "addRemoteService": "Ajouter un service à distance",
             "exploreMaps": "Explorer les cartes",
             "createMap": "Créer une carte",
             "apps": "Apps",
+            "createApp": "Créer une app",
             "announcements": "Annonces",
             "inviteUsers": "Inviter des utilisateurs",
             "addUser": "Ajouter un utilisateur",
@@ -95,7 +102,32 @@
             "developers": "Développeurs",
             "customFilterExample": "Filtre personnalisé (Global)",
             "copiedResourceUrl": "URL de la ressource copiée!",
-            "copyResourceUrl": "Copier l'URL de la ressource"
+            "copyResourceUrl": "Copier l'URL de la ressource",
+            "open": "Ouvert",
+            "share": "Partager",
+            "update": "Mettre à jour",
+            "delete": "Effacer",
+            "customFiltersTitle": "Ressources",
+            "myResources": "Mes ressources",
+            "pendingApproval": "En attente de validation",
+            "featuredList": "Mis en exergue"
+        },
+        "viewer":{
+            "document": {
+                "unSupportedMedia": "Le format multimédia n'est pas pris en charge"
+            },
+            "errors": {
+                "noPermissions": "Vous n'êtes pas autorisé à ajouter une géohistoire"
+            }
+        },
+        "gnviewer":{
+            "edit": "Éditer",
+            "details": "Des détails",
+            "editMetadata": "Modifier les Métadonnées",
+            "editStyle": "Modifier le Style",
+            "editData": "Modifier les Données",
+            "backToDataset": "Retour à l'Ensemble de Données",
+            "uploadImage": "Cliquez ou faites glisser et déposez une image"
         }
     }
 }

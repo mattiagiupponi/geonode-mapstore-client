@@ -20,8 +20,9 @@
             "method": "bearer"
         }
     ],
+    "defaultLayerFormat": "image/png",
     "geoNodeApi": {
-        "endpointAdapter": "/mapstore/rest",
+        "endpointAdapter": "/mapstore/rest/",
         "endpointAutocomplete": "/base/autocomplete_response",
         "endpointV1": "/api",
         "endpointV2": "/api/v2"
@@ -74,8 +75,15 @@
         {
             "name": "geoNodeResourcesInfo",
             "path": "localConfig.geoNodeResourcesInfo"
+        },
+        {
+            "name": "selectedLayerPermissions",
+            "path": "gnresource.selectedLayerPermissions"
+        },
+        {
+            "name": "gnResourceData",
+            "path": "gnresource.data"
         }
-
     ],
     "projectionDefs": [
         {
@@ -191,75 +199,79 @@
                 "style": {}
             }
         },
+        "filtersForm": {
+            "items": [
+                {
+                    "type": "group",
+                    "labelId": "gnhome.customFiltersTitle",
+                    "authenticated": true,
+                    "items": [
+                        {
+                            "id": "my-resources",
+                            "labelId": "gnhome.myResources",
+                            "type": "filter",
+                            "query": {
+                                "filter{owner.pk}": "{state('user') && state('user').pk}"
+                            },
+                            "authenticated": true
+                        },
+                        {
+                            "id": "pending-approval",
+                            "labelId": "gnhome.pendingApproval",
+                            "type": "filter",
+                            "query": {
+                                "filter{is_approved}": false
+                            },
+                            "authenticated": true
+                        },
+                        {
+                            "id": "favorite",
+                            "labelId": "gnhome.favorites",
+                            "type": "filter",
+                            "query": {
+                                "favorite": true
+                            },
+                            "authenticated": true
+                        }
+                    ]
+                },
+                {
+                    "type": "divider",
+                    "authenticated": true
+                },
+                {
+                    "labelId": "gnhome.resourceTypes",
+                    "placeholderId": "gnhome.resourceTypesPlaceholder",
+                    "type": "select",
+                    "suggestionsRequestKey": "resourceTypes"
+                },
+                {
+                    "labelId": "gnhome.categories",
+                    "placeholderId": "gnhome.categoriesPlaceholder",
+                    "type": "select",
+                    "suggestionsRequestKey": "categories"
+                },
+                {
+                    "labelId": "gnhome.keywords",
+                    "placeholderId": "gnhome.keywordsPlaceholder",
+                    "type": "select",
+                    "suggestionsRequestKey": "keywords"
+                },
+                {
+                    "labelId": "gnhome.regions",
+                    "placeholderId": "gnhome.regionsPlaceholder",
+                    "type": "select",
+                    "suggestionsRequestKey": "regions"
+                },
+                {
+                    "labelId": "gnhome.owners",
+                    "placeholderId": "gnhome.ownersPlaceholder",
+                    "type": "select",
+                    "suggestionsRequestKey": "owners"
+                }
+            ]
+        },
         "filters": {
-            "fields": {
-                "options": [
-                    {
-                        "labelId": "gnhome.resourceTypes",
-                        "placeholderId": "gnhome.resourceTypesPlaceholder",
-                        "type": "select",
-                        "suggestionsRequestKey": "resourceTypes"
-                    },
-                    {
-                        "labelId": "gnhome.categories",
-                        "placeholderId": "gnhome.categoriesPlaceholder",
-                        "type": "select",
-                        "suggestionsRequestKey": "categories"
-                    },
-                    {
-                        "labelId": "gnhome.keywords",
-                        "placeholderId": "gnhome.keywordsPlaceholder",
-                        "type": "select",
-                        "suggestionsRequestKey": "keywords"
-                    },
-                    {
-                        "labelId": "gnhome.regions",
-                        "placeholderId": "gnhome.regionsPlaceholder",
-                        "type": "select",
-                        "suggestionsRequestKey": "regions"
-                    },
-                    {
-                        "labelId": "gnhome.owners",
-                        "placeholderId": "gnhome.ownersPlaceholder",
-                        "type": "select",
-                        "suggestionsRequestKey": "owners"
-                    }
-                ],
-                "links": [
-                    {
-                        "myresources": [
-                            {
-                                "labelId": "gnhome.myresources",
-                                "type": "link",
-                                "href": "#",
-                                "authenticated": false
-                            },
-                            {
-                                "labelId": "gnhome.signIn",
-                                "type": "link",
-                                "href": "#",
-                                "authenticated": false
-                            }
-                        ]
-                    },
-                    {
-                        "mylink": [
-                            {
-                                "labelId": "gnhome.myresources",
-                                "type": "link",
-                                "href": "account/signup/?next=/",
-                                "authenticated": false
-                            },
-                            {
-                                "labelId": "gnhome.signIn",
-                                "type": "link",
-                                "href": "account/login/?next=/",
-                                "authenticated": false
-                            }
-                        ]
-                    }
-                ]
-            },
             "order": {
                 "defaultLabelId": "gnhome.orderBy",
                 "options": [
@@ -316,27 +328,47 @@
                     "labelId": "gnhome.createNew",
                     "authenticated": true,
                     "type": "dropdown",
+                    "perms": [{ "type": "user", "value": "add_resource" }],
                     "items": [
+                        {
+                            "labelId": "gnhome.layer",
+                            "value": "layer",
+                            "type": "link",
+                            "href": "/layers/upload",
+                            "authenticated": true,
+                            "perms": [{ "type": "user", "value": "add_resource" }]
+                        },
+                        {
+                            "labelId": "gnhome.document",
+                            "value": "document",
+                            "type": "link",
+                            "href": "/documents/upload",
+                            "authenticated": true,
+                            "perms": [{ "type": "user", "value": "add_resource" }]
+                        },
                         {
                             "labelId": "gnhome.map",
                             "value": "map",
                             "type": "link",
-                            "href": "/maps/new",
-                            "authenticated": true
+                            "href": "/viewer/#/map/new",
+                            "authenticated": true,
+                            "perms": [{ "type": "user", "value": "add_resource" }]
                         },
                         {
                             "labelId": "gnhome.geostory",
                             "value": "geostory",
                             "type": "link",
-                            "href": "/apps/new?appType=GeoStory",
-                            "authenticated": true
+                            "href": "/viewer/#/geostory/new",
+                            "authenticated": true,
+                            "perms": [{ "type": "user", "value": "add_resource" }]
                         }
 
                     ]
                 },
                 {
                     "type": "divider",
-                    "authenticated": true
+                    "authenticated": true,
+                    "perms": [{ "type": "user", "value": "add_resource" }]
                 }
             ]
         },
@@ -344,7 +376,7 @@
             "logo": [
                 {
                     "src": "/static/mapstore/img/geonode-logo.svg",
-                    "href": "#/"
+                    "href": "/"
                 }
             ],
             "items": [
@@ -377,7 +409,7 @@
                         },
                         {
                             "type": "link",
-                            "href": "/favorite/list/",
+                            "href": "/favourite/list/",
                             "labelId": "gnhome.favorites"
                         },
                         {
@@ -430,29 +462,14 @@
         "menu": {
             "items": [
                 {
-                    "labelId": "gnhome.data",
+                    "labelId": "gnhome.layers",
                     "type": "dropdown",
                     "items": [
                         {
                             "type": "link",
-                            "href": "/layers/?limit=5",
+                            "href": "#/search/?filter{resource_type.in}=layer",
                             "labelId": "gnhome.layers",
-                            "badge": "{state('geoNodeResourcesInfo').layersTotalCount}",
-                            "permissions": [],
-                            "allowedRoles": []
-                        },
-                        {
-                            "type": "link",
-                            "href": "/documents/?limit=5",
-                            "labelId": "gnhome.documents",
-                            "badge": "{state('geoNodeResourcesInfo').documentsTotalCount}",
-                            "permissions": [],
-                            "allowedRoles": []
-                        },
-                        {
-                            "type": "link",
-                            "href": "/services/?limit=5",
-                            "labelId": "gnhome.remoteServices",
+                            "badge": "{state('geoNodeResourcesInfo') && state('geoNodeResourcesInfo').layersTotalCount}",
                             "permissions": [],
                             "allowedRoles": []
                         },
@@ -460,7 +477,8 @@
                             "type": "divider",
                             "authenticated": true,
                             "permissions": [],
-                            "allowedRoles": []
+                            "allowedRoles": [],
+                            "perms": [{ "type": "user", "value": "add_resource" }]
                         },
                         {
                             "type": "link",
@@ -468,7 +486,29 @@
                             "labelId": "gnhome.uploadLayer",
                             "authenticated": true,
                             "permissions": [],
+                            "allowedRoles": [],
+                            "perms": [{ "type": "user", "value": "add_resource" }]
+                        }
+                    ]
+                },
+                {
+                    "labelId": "gnhome.documents",
+                    "type": "dropdown",
+                    "items": [
+                        {
+                            "type": "link",
+                            "href": "#/search/?filter{resource_type.in}=document",
+                            "labelId": "gnhome.documents",
+                            "badge": "{state('geoNodeResourcesInfo') && state('geoNodeResourcesInfo').documentsTotalCount}",
+                            "permissions": [],
                             "allowedRoles": []
+                        },
+                        {
+                            "type": "divider",
+                            "authenticated": true,
+                            "permissions": [],
+                            "allowedRoles": [],
+                            "perms": [{ "type": "user", "value": "add_resource" }]
                         },
                         {
                             "type": "link",
@@ -476,51 +516,69 @@
                             "labelId": "gnhome.uploadDocument",
                             "authenticated": true,
                             "permissions": [],
-                            "allowedRoles": []
-                        },
-                        {
-                            "type": "link",
-                            "href": "/services/register/",
-                            "labelId": "gnhome.addRemoteService",
-                            "authenticated": true,
-                            "allowedRoles": [
-                                "admin"
-                            ]
+                            "allowedRoles": [],
+                            "perms": [{ "type": "user", "value": "add_resource" }]
                         }
                     ]
                 },
                 {
-                    "labelId": "gnhome.maps",
-                    "authenticated": false,
-                    "type": "link",
-                    "subType": "tag",
-                    "href": "/maps/?limit=5",
-                    "badge": "{state('geoNodeResourcesInfo').mapsTotalCount}"
+                    "type": "divider"
                 },
                 {
                     "labelId": "gnhome.maps",
                     "type": "dropdown",
-                    "authenticated": true,
-                    "badge": "{state('geoNodeResourcesInfo').mapsTotalCount}",
                     "items": [
                         {
                             "type": "link",
-                            "href": "/maps/?limit=5",
-                            "labelId": "gnhome.exploreMaps"
+                            "href": "#/search/?filter{resource_type.in}=map",
+                            "labelId": "gnhome.exploreMaps",
+                            "badge": "{state('geoNodeResourcesInfo') && state('geoNodeResourcesInfo').mapsTotalCount}"
+                        },
+                        {
+                            "type": "divider",
+                            "authenticated": true,
+                            "permissions": [],
+                            "allowedRoles": [],
+                            "perms": [{ "type": "user", "value": "add_resource" }]
                         },
                         {
                             "type": "link",
-                            "href": "/maps/new",
-                            "labelId": "gnhome.createMap"
+                            "href": "/viewer/#/map/new",
+                            "labelId": "gnhome.createMap",
+                            "authenticated": true,
+                            "permissions": [],
+                            "allowedRoles": [],
+                            "perms": [{ "type": "user", "value": "add_resource" }]
                         }
                     ]
                 },
                 {
-                    "type": "link",
-                    "subType": "tag",
-                    "href": "/apps/?limit=5",
-                    "labelId": "gnhome.apps",
-                    "badge": "{state('geoNodeResourcesInfo').geoappsTotalCount}"
+                    "labelId": "gnhome.geostories",
+                    "type": "dropdown",
+                    "items": [
+                        {
+                            "type": "link",
+                            "href": "#/search/?filter{resource_type.in}=geostory",
+                            "labelId": "gnhome.geostories",
+                            "badge": "{state('geoNodeResourcesInfo') && state('geoNodeResourcesInfo').geoappsTotalCount}"
+                        },
+                        {
+                            "type": "divider",
+                            "authenticated": true,
+                            "permissions": [],
+                            "allowedRoles": [],
+                            "perms": [{ "type": "user", "value": "add_resource" }]
+                        },
+                        {
+                            "type": "link",
+                            "href": "/viewer/#/geostory/new",
+                            "labelId": "gnhome.createGeostory",
+                            "authenticated": true,
+                            "permissions": [],
+                            "allowedRoles": [],
+                            "perms": [{ "type": "user", "value": "add_resource" }]
+                        }
+                    ]
                 },
                 {
                     "labelId": "gnhome.about",
@@ -552,13 +610,15 @@
                         },
                         {
                             "type": "divider",
-                            "authenticated": true
+                            "authenticated": true,
+                            "perms": [{ "type": "user", "value": "add_resource" }]
                         },
                         {
                             "type": "link",
                             "href": "/invitations/geonode-send-invite/",
                             "labelId": "gnhome.inviteUsers",
-                            "authenticated": true
+                            "authenticated": true,
+                            "perms": [{ "type": "user", "value": "add_resource" }]
                         },
                         {
                             "type": "link",
@@ -567,7 +627,8 @@
                             "authenticated": true,
                             "allowedRoles": [
                                 "admin"
-                            ]
+                            ],
+                            "perms": [{ "type": "user", "value": "add_resource" }]
                         },
                         {
                             "type": "link",
@@ -576,8 +637,42 @@
                             "authenticated": true,
                             "allowedRoles": [
                                 "admin"
-                            ]
+                            ],
+                            "perms": [{ "type": "user", "value": "add_resource" }]
                         }
+                    ]
+                }
+            ]
+        },
+        "cardOptions": {
+            "items":[
+                {
+                    "type": "link",
+                    "href": "${detail_url}",
+                    "labelId": "gnhome.open",
+                    "icon": "edit",
+                    "perms": [{ "type": "resource", "value": "view_resourcebase" }]
+                },
+                {
+                    "type": "link",
+                    "href":"${detail_url}/metadata_advanced",
+                    "labelId": "gnhome.update",
+                    "icon": "paste",
+                    "authenticated": true,
+                    "perms": [{ "type": "resource", "value": "change_resourcebase" }],
+                    "allowedGroups": [
+                        "admin"
+                    ]
+                },
+                {
+                    "type": "link",
+                    "href":"${detail_url}/remove",
+                    "labelId": "gnhome.delete",
+                    "icon": "trash",
+                    "authenticated": true,
+                    "perms": [{ "type": "resource", "value": "delete_resourcebase" }],
+                    "allowedGroups": [
+                        "admin"
                     ]
                 }
             ]
@@ -1092,7 +1187,10 @@
                 "name": "Playback"
             },
             {
-                "name": "LayerDownload"
+                "name": "LayerDownload",
+                "cfg": {
+                    "disablePluginIf": "{!state('selectedLayerPermissions').includes('download_resourcebase')}"
+                }
             },
             {
                 "name": "AddLayer"
@@ -1364,7 +1462,10 @@
                 "name": "Playback"
             },
             {
-                "name": "LayerDownload"
+                "name": "LayerDownload",
+                "cfg": {
+                    "disablePluginIf": "{!state('selectedLayerPermissions').includes('download_resourcebase')}"
+                }
             },
             {
                 "name": "AddLayer"
@@ -1633,7 +1734,10 @@
                 "name": "Playback"
             },
             {
-                "name": "LayerDownload"
+                "name": "LayerDownload",
+                "cfg": {
+                    "disablePluginIf": "{!state('selectedLayerPermissions').includes('download_resourcebase')}"
+                }
             },
             {
                 "name": "AddLayer"
@@ -1882,7 +1986,10 @@
                 "name": "Playback"
             },
             {
-                "name": "LayerDownload"
+                "name": "LayerDownload",
+                "cfg": {
+                    "disablePluginIf": "{!state('selectedLayerPermissions').includes('download_resourcebase')}"
+                }
             },
             {
                 "name": "AddLayer"
@@ -2149,7 +2256,10 @@
                 "name": "Playback"
             },
             {
-                "name": "LayerDownload"
+                "name": "LayerDownload",
+                "cfg": {
+                    "disablePluginIf": "{!state('selectedLayerPermissions').includes('download_resourcebase')}"
+                }
             },
             {
                 "name": "AddLayer"
@@ -2487,10 +2597,39 @@
                 "name": "ViewerLayout"
             },
             {
-                "name": "ActionNavbar"
+                "name": "ActionNavbar",
+                "cfg": {
+                    "leftMenuItems": [
+                        {
+                            "labelId": "gnviewer.edit",
+                            "type": "dropdown",
+                            "perms": [{ "type": "resource", "value": "change_resourcebase" }],
+                            "items": [
+                                {
+                                    "type": "link",
+                                    "href": "{(state('gnResourceData') || {}).detail_url + '/metadata'}",
+                                    "labelId": "gnviewer.editMetadata"
+                                },
+                                {
+                                    "type": "link",
+                                    "href": "{'#/layer/' + (state('gnResourceData') || {}).pk + '/edit/style'}",
+                                    "labelId": "gnviewer.editStyle"
+                                },
+                                {
+                                    "type": "link",
+                                    "href": "{'#/layer/' + (state('gnResourceData') || {}).pk + '/edit/data'}",
+                                    "labelId": "gnviewer.editData"
+                                }
+                            ]
+                        }
+                    ]
+                }
             },
             {
                 "name": "BrandNavbar"
+            },
+            {
+                "name": "DetailViewer"
             },
             {
                 "name": "Map",
@@ -2538,7 +2677,11 @@
                 "override": {
                     "Toolbar": {
                         "position": 11,
-                        "alwaysVisible": false
+                        "alwaysVisible": false,
+                        "priority": 1
+                    },
+                    "ViewerLayout": {
+                        "priority": 1
                     }
                 }
             },
@@ -2573,9 +2716,6 @@
             },
             {
                 "name": "Expander"
-            },
-            {
-                "name": "BurgerMenu"
             },
             {
                 "name": "MapFooter",
@@ -2632,7 +2772,10 @@
                 "name": "Playback"
             },
             {
-                "name": "LayerDownload"
+                "name": "LayerDownload",
+                "cfg": {
+                    "disablePluginIf": "{!state('selectedLayerPermissions').includes('download_resourcebase')}"
+                }
             },
             {
                 "name": "AddLayer"
@@ -2724,12 +2867,6 @@
                 "name": "Notifications"
             },
             {
-                "name": "Share",
-                "cfg": {
-                    "pathTemplate": "/maps/{id}/embed"
-                }
-            },
-            {
                 "name": "Locate"
             }
         ],
@@ -2738,10 +2875,87 @@
                 "name": "ViewerLayout"
             },
             {
-                "name": "ActionNavbar"
+                "name": "ActionNavbar",
+                "cfg": {
+                    "leftMenuItems": [
+                        {
+                            "type": "link",
+                            "href": "{'#/layer/' + (state('gnResourceData') || {}).pk}",
+                            "labelId": "gnviewer.backToDataset"
+                        }
+                    ]
+                }
             },
             {
                 "name": "BrandNavbar"
+            },
+            {
+                "name": "FeatureEditor",
+                "override": {
+                    "ViewerLayout": {
+                        "priority": 1
+                    },
+                    "TOC": {
+                        "priority": 1,
+                        "doNotHide": false
+                    }
+                }
+            },
+            {
+                "name": "QueryPanel",
+                "cfg": {
+                    "activateQueryTool": true,
+                    "spatialOperations": [
+                        {
+                            "id": "INTERSECTS",
+                            "name": "queryform.spatialfilter.operations.intersects"
+                        },
+                        {
+                            "id": "BBOX",
+                            "name": "queryform.spatialfilter.operations.bbox"
+                        },
+                        {
+                            "id": "CONTAINS",
+                            "name": "queryform.spatialfilter.operations.contains"
+                        },
+                        {
+                            "id": "WITHIN",
+                            "name": "queryform.spatialfilter.operations.within"
+                        }
+                    ],
+                    "spatialMethodOptions": [
+                        {
+                            "id": "Viewport",
+                            "name": "queryform.spatialfilter.methods.viewport"
+                        },
+                        {
+                            "id": "BBOX",
+                            "name": "queryform.spatialfilter.methods.box"
+                        },
+                        {
+                            "id": "Circle",
+                            "name": "queryform.spatialfilter.methods.circle"
+                        },
+                        {
+                            "id": "Polygon",
+                            "name": "queryform.spatialfilter.methods.poly"
+                        }
+                    ]
+                },
+                "override": {
+                    "ViewerLayout": {
+                        "priority": 1
+                    }
+                }
+            },
+            {
+                "name": "MapFooter",
+                "override": {
+                    "ViewerLayout": {
+                        "priority": 1,
+                        "target": "footer"
+                    }
+                }
             },
             {
                 "name": "Map",
@@ -2770,6 +2984,9 @@
                         "priority": 1
                     }
                 }
+            },
+            {
+                "name": "Notifications"
             }
         ],
         "layer_edit_style_viewer": [
@@ -2777,10 +2994,69 @@
                 "name": "ViewerLayout"
             },
             {
-                "name": "ActionNavbar"
+                "name": "ActionNavbar",
+                "cfg": {
+                    "leftMenuItems": [
+                        {
+                            "type": "link",
+                            "href": "{'#/layer/' + (state('gnResourceData') || {}).pk}",
+                            "labelId": "gnviewer.backToDataset"
+                        }
+                    ]
+                }
             },
             {
                 "name": "BrandNavbar"
+            },
+            {
+                "name": "StyleEditor",
+                "cfg": {
+                    "styleService": {
+                        "baseUrl": "{state('settings') && state('settings').geonodeUrl && state('settings').geonodeUrl + 'gs/' || '/gs/'}",
+                        "formats": [
+                            "css",
+                            "sld"
+                        ],
+                        "availableUrls": [
+                            "{state('settings') && state('settings').geoserverUrl || '/geoserver/'}",
+                            "{state('settings') && state('settings').geonodeUrl && state('settings').geonodeUrl + 'gs/' || '/gs/'}"
+                        ],
+                        "fonts": [
+                            "Arial",
+                            "Courier New",
+                            "Monospaced",
+                            "SansSerif",
+                            "Serif",
+                            "Times New Roman"
+                        ]
+                    },
+                    "editingAllowedRoles": null,
+                    "enableSetDefaultStyle": true
+                }
+            },
+            {
+                "name": "DrawerMenu",
+                "override": {
+                    "ViewerLayout": {
+                        "priority": 1
+                    }
+                }
+            },
+            {
+                "name": "TOCItemsSettings",
+                "cfg": {
+                    "hideTitleTranslations": true,
+                    "showFeatureInfoTab": false
+                }
+            },
+            {
+                "name": "MapFooter",
+                "override": {
+                    "ViewerLayout": {
+                        "priority": 1,
+                        "target": "footer"
+                    }
+                }
             },
             {
                 "name": "Map",
@@ -2809,15 +3085,33 @@
                         "priority": 1
                     }
                 }
+            },
+            {
+                "name": "Notifications"
             }
         ],
         "map_viewer": [
             { "name": "ViewerLayout" },
-            { "name": "ActionNavbar" },
+            {
+                "name": "ActionNavbar",
+                "cfg": {
+                    "leftMenuItems": [
+                        {
+                            "type": "link",
+                            "href": "{(state('gnResourceData') || {}).detail_url + '/metadata'}",
+                            "labelId": "gnviewer.editMetadata",
+                            "perms": [{ "type": "resource", "value": "change_resourcebase" }]
+                        }
+                    ]
+                }
+            },
+            { "name": "DetailViewer"},
             { "name": "BrandNavbar" },
             {
                 "name": "Map",
                 "cfg": {
+                    "shouldLoadFont": false,
+                    "fonts": [],
                     "tools": [
                         "measurement",
                         "draw",
@@ -2859,7 +3153,11 @@
                 "override": {
                     "Toolbar": {
                         "position": 11,
-                        "alwaysVisible": false
+                        "alwaysVisible": false,
+                        "priority": 1
+                    },
+                    "ViewerLayout": {
+                        "priority": 1
                     }
                 }
             },
@@ -2908,14 +3206,6 @@
             },
             {
                 "name": "Expander"
-            },
-            {
-                "name": "BurgerMenu",
-                "override": {
-                    "ViewerLayout": {
-                        "priority": 1
-                    }
-                }
             },
             {
                 "name": "MapFooter",
@@ -2972,7 +3262,10 @@
                 "name": "Playback"
             },
             {
-                "name": "LayerDownload"
+                "name": "LayerDownload",
+                "cfg": {
+                    "disablePluginIf": "{!state('selectedLayerPermissions').includes('download_resourcebase')}"
+                }
             },
             {
                 "name": "AddLayer"
@@ -2988,6 +3281,10 @@
                 "override": {
                     "ViewerLayout": {
                         "priority": 1
+                    },
+                    "TOC": {
+                        "priority": 1,
+                        "doNotHide": false
                     }
                 }
             },
@@ -3079,11 +3376,6 @@
                 "cfg": {
                     "hideTitleTranslations": true,
                     "showFeatureInfoTab": false
-                },
-                "override": {
-                    "ViewerLayout": {
-                        "priority": 1
-                    }
                 }
             },
             {
@@ -3091,6 +3383,10 @@
                 "override": {
                     "ViewerLayout": {
                         "priority": 1
+                    },
+                    "TOC": {
+                        "priority": 1,
+                        "doNotHide": false
                     }
                 }
             },
@@ -3124,7 +3420,16 @@
                 "name": "Locate"
             },
             {
-                "name": "WidgetsBuilder"
+                "name": "WidgetsBuilder",
+                "override": {
+                    "ViewerLayout": {
+                        "priority": 1
+                    },
+                    "TOC": {
+                        "priority": 1,
+                        "doNotHide": false
+                    }
+                }
             },
             {
                 "name": "Save",
@@ -3164,29 +3469,21 @@
         ],
         "geostory_viewer": [
             { "name": "ViewerLayout" },
-            { "name": "ActionNavbar" },
-            { "name": "BrandNavbar" },
             {
-                "name": "OmniBar",
+                "name": "ActionNavbar",
                 "cfg": {
-                    "disablePluginIf": "{!!(state('browser') && state('browser').mobile)}",
-                    "containerPosition": "header",
-                    "className": "navbar shadow navbar-home"
-                },
-                "override": {
-                    "ViewerLayout": {
-                        "priority": 1
-                    }
+                    "leftMenuItems": [
+                        {
+                            "type": "link",
+                            "href": "{(state('gnResourceData') || {}).detail_url + '/metadata'}",
+                            "labelId": "gnviewer.editMetadata",
+                            "perms": [{ "type": "resource", "value": "change_resourcebase" }]
+                        }
+                    ]
                 }
             },
-            {
-                "name": "BurgerMenu",
-                "override": {
-                    "ViewerLayout": {
-                        "priority": 1
-                    }
-                }
-            },
+            { "name": "BrandNavbar" },
+            { "name": "DetailViewer"},
             {
                 "name": "GeoStory",
                 "cfg": {
@@ -3252,12 +3549,16 @@
             {
                 "name": "GeoStoryEditor",
                 "cfg": {
-                    "disablePluginIf": "{!!(state('browser') && state('browser').mobile)}",
-                    "containerPosition": "columns"
+                    "disablePluginIf": "{!!(state('browser') && state('browser').mobile)}"
                 },
                 "override": {
-                    "ViewerLayout": {
+                    "GeoStoryNavigation": {
                         "priority": 1
+                    },
+                    "ViewerLayout": {
+                        "priority": 1,
+                        "target": "leftColumn",
+                        "name": "GeoStoryEditor"
                     }
                 }
             },
@@ -3287,8 +3588,23 @@
         ],
         "document_viewer": [
             { "name": "ViewerLayout" },
-            { "name": "ActionNavbar" },
-            { "name": "BrandNavbar" }
+            {
+                "name": "ActionNavbar",
+                "cfg": {
+                    "leftMenuItems": [
+                        {
+                            "type": "link",
+                            "href": "{(state('gnResourceData') || {}).detail_url + '/metadata'}",
+                            "labelId": "gnviewer.editMetadata",
+                            "perms": [{ "type": "resource", "value": "change_resourcebase" }]
+                        }
+                    ]
+                }
+            },
+            { "name": "BrandNavbar" },
+            { "name": "DetailViewer"},
+            { "name": "Save" },
+            {"name": "MediaViewer"}
         ]
     }
 }

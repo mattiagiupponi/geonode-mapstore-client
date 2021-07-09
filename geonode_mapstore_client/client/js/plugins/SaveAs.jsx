@@ -15,6 +15,7 @@ import Message from '@mapstore/framework/components/I18N/Message';
 import { Glyphicon } from 'react-bootstrap';
 import { mapInfoSelector } from '@mapstore/framework/selectors/map';
 import { isLoggedIn } from '@mapstore/framework/selectors/security';
+import Button from '@js/components/Button';
 import {
     saveContent,
     clearSave,
@@ -55,7 +56,7 @@ function SaveAs(props) {
     return (
         <SaveModal
             {...props}
-            labelId="saveAs"
+            labelId="save"
         />
     );
 }
@@ -87,6 +88,34 @@ const SaveAsPlugin = connect(
     }
 )(SaveAs);
 
+function SaveAsButton({
+    enabled,
+    onClick
+}) {
+    return enabled
+        ? <Button
+            variant="primary"
+            onClick={() => onClick()}
+        >
+            <Message msgId="saveAs"/>
+        </Button>
+        : null
+    ;
+}
+
+const ConnectedSaveAsButton = connect(
+    createSelector(
+        isLoggedIn,
+        (state) => state?.security?.user?.perms?.includes("add_resource"),
+        (loggedIn, canAddResource) => ({
+            enabled: loggedIn && canAddResource
+        })
+    ),
+    {
+        onClick: toggleControl.bind(null, 'saveAs', null)
+    }
+)((SaveAsButton));
+
 export default createPlugin('SaveAs', {
     component: SaveAsPlugin,
     containers: {
@@ -98,10 +127,16 @@ export default createPlugin('SaveAs', {
             action: toggleControl.bind(null, 'saveAs', null),
             selector: createSelector(
                 isLoggedIn,
-                (loggedIn) => ({
-                    style: loggedIn ? {} : { display: 'none' }
+                (state) => state?.security?.user?.perms?.includes("add_resource"),
+                (loggedIn, canAddResource) => ({
+                    style: (loggedIn && canAddResource) ? {} : { display: 'none' }
                 })
             )
+        },
+        ActionNavbar: {
+            name: 'SaveAs',
+            target: 'leftMenuItem',
+            Component: ConnectedSaveAsButton
         }
     },
     epics: {

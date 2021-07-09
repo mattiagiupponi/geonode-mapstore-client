@@ -92,19 +92,16 @@ export function setupConfiguration({
     // so it's possible to override in a custom project
     setConfigProp('extensionsRegistry', '/static/mapstore/extensions/index.json');
     const {
-        geoNodeConfiguration,
         supportedLocales: defaultSupportedLocales,
         ...config
     } = localConfig;
     const geoNodePageConfig = window.__GEONODE_CONFIG__ || {};
-    const permissionsList = geoNodePageConfig.permissionsList || [];
-
-    const canEdit = geoNodePageConfig.isNewResource || permissionsList.indexOf('change_resourcebase') !== -1;
-    const canView = geoNodePageConfig.isNewResource || permissionsList.indexOf('view_resourcebase') !== -1;
+    const perms = geoNodePageConfig.perms || [];
+    const canEdit = geoNodePageConfig.isNewResource || perms.indexOf('change_resourcebase') !== -1;
+    const canView = geoNodePageConfig.isNewResource || perms.indexOf('view_resourcebase') !== -1;
     Object.keys(config).forEach((key) => {
         setConfigProp(key, config[key]);
     });
-
     setConfigProp('translationsPath', config.translationsPath
         ? config.translationsPath
         : __MAPSTORE_PROJECT_CONFIG__.translationsPath
@@ -113,8 +110,6 @@ export function setupConfiguration({
     setSupportedLocales(supportedLocales);
     const locale = supportedLocales[geoNodePageConfig.languageCode]?.code;
     setConfigProp('locale', locale);
-    const menuFilters = geoNodeConfiguration?.menu?.items?.filter(({ type }) => type === 'filter');
-    setConfigProp('menuFilters', menuFilters);
     const geoNodeResourcesInfo = getConfigProp('geoNodeResourcesInfo') || {};
     setConfigProp('geoNodeResourcesInfo', { ...geoNodeResourcesInfo, ...resourcesTotalCount });
     const userDetails = geoNodePageConfig.userDetails;
@@ -156,7 +151,7 @@ export function setupConfiguration({
     return {
         query,
         securityState,
-        geoNodeConfiguration,
+        geoNodeConfiguration: localConfig.geoNodeConfiguration,
         geoNodePageConfig,
         pluginsConfigKey: query.config || geoNodePageConfig.pluginsConfigKey,
         mapType: geoNodePageConfig.mapType,
@@ -182,4 +177,14 @@ export function setupConfiguration({
             gnMapStoreApiEpic: actionTrigger.epic
         }
     };
+}
+
+export function getPageSize(width) {
+    if (width < 968) {
+        return 'sm';
+    }
+    if (width < 1400) {
+        return 'md';
+    }
+    return 'lg';
 }
