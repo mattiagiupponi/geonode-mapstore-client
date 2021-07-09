@@ -40,7 +40,7 @@ import LayerViewerRoute from '@js/routes/LayerViewer';
 import MapViewerRoute from '@js/routes/MapViewer';
 import GeoStoryViewerRoute from '@js/routes/GeoStoryViewer';
 import DocumentViewerRoute from '@js/routes/DocumentViewer';
-import DashboardViewerRoute from '@js/routes/DashboardViewerRoute';
+//import DashboardViewerRoute from '@js/routes/DashboardViewerRoute';
 
 import gnresource from '@js/reducers/gnresource';
 import gnsettings from '@js/reducers/gnsettings';
@@ -120,13 +120,6 @@ const routes = [
             '/geostory/:pk'
         ],
         component: GeoStoryViewerRoute
-    },    
-    {
-        name: 'dashboard_viewer',
-        path: [
-            '/dashboard/:pk'
-        ],
-        component: DashboardViewerRoute
     },
     {
         name: 'document_viewer',
