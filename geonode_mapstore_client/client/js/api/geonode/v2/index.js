@@ -29,8 +29,6 @@ let endpoints = {
     'layers': '/api/v2/layers',
     'maps': '/api/v2/maps',
     'geoapps': '/api/v2/geoapps',
-    'geostories': '/api/v2/geoapps?filter{resource_type.in}=geostory',
-    'dashboards': '/api/v2/geoapps?filter{resource_type.in}=dashboard',
     'users': '/api/v2/users',
     'resource_types': '/api/v2/resources/resource_types',
     'categories': '/api/v2/categories',
@@ -44,8 +42,6 @@ const DOCUMENTS = 'documents';
 const LAYERS = 'layers';
 const MAPS = 'maps';
 const GEOAPPS = 'geoapps';
-const GEOSTORIES = 'geostories';
-const DASHBOARDS = 'dashboards';
 const USERS = 'users';
 const RESOURCE_TYPES = 'resource_types';
 const OWNERS = 'owners';
@@ -401,37 +397,22 @@ export const getLayersByName = names => {
 };
 
 export const getResourcesTotalCount = () => {
-    const params = {
-        page_size: 1
-    };
-    const types = [
-        DOCUMENTS,
-        LAYERS,
-        MAPS,
-        GEOSTORIES,
-        DASHBOARDS
-    ];
-    return axios.all(
-        types.map((type) =>
-            axios.get(parseDevHostname(endpoints[type]), { params })
-                .then(({ data }) => data.total)
-                .catch(() => null)
-        )
-    )
-        .then(([
-            documentsTotalCount,
-            layersTotalCount,
-            mapsTotalCount,
-            geostoriesTotalCount,
-            dashboardsTotalCount
-        ]) => {
-            return {
-                documentsTotalCount,
-                layersTotalCount,
-                mapsTotalCount,
-                geostoriesTotalCount,
-                dashboardsTotalCount
+    return axios.get('/api/v2/resources/resource_types')
+        .then(({ data }) => data.resource_types)
+        .then((resourceTypes) => {
+            console.log("ajshdhasjkdasjk");
+            const keysMap = {
+                'document': 'documentsTotalCount',
+                'layer': 'layersTotalCount',
+                'map': 'mapsTotalCount',
+                'geostory': 'geostoriesTotalCount',
+                'dashboard': 'dashboardsTotalCount'
             };
+            const totalCount = resourceTypes.reduce((acc, { name, count }) => ({
+                ...acc,
+                [keysMap[name]]: count || 0
+            }), {});
+            return totalCount;
         });
 };
 
