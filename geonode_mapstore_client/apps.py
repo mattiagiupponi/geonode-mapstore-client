@@ -21,6 +21,8 @@ def run_setup_hooks(*args, **kwargs):
     LOCAL_ROOT = os.path.abspath(os.path.dirname(__file__))
     settings.TEMPLATES[0]["DIRS"].insert(0, os.path.join(LOCAL_ROOT, "templates"))
 
+    setattr(settings, "MAPSTORE_CLIENT_APP_LIST", ['geostory', "dashboard"])
+
     urlpatterns += [
         url(r'^mapstore/', include('mapstore2_adapter.urls')),
         url(r'^viewer/', TemplateView.as_view(template_name='geonode-mapstore-client/viewer.html')),
