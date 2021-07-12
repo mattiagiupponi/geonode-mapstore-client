@@ -400,7 +400,6 @@ export const getResourcesTotalCount = () => {
     return axios.get('/api/v2/resources/resource_types')
         .then(({ data }) => data.resource_types)
         .then((resourceTypes) => {
-            console.log("ajshdhasjkdasjk");
             const keysMap = {
                 'document': 'documentsTotalCount',
                 'layer': 'layersTotalCount',
