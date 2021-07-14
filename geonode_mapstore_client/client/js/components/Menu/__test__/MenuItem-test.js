@@ -18,7 +18,7 @@ const Item = {
         {
             "type": "link",
             "href": "/layers/?limit=5",
-            "labelId": "gnhome.layers",
+            "labelId": "gnhome.datasets",
             "badge": "${layersTotalCount}"
         },
         {
@@ -38,7 +38,7 @@ const Item = {
         },
         {
             "type": "link",
-            "href": "/layers/upload",
+            "href": "/datasets/upload",
             "labelId": "gnhome.uploadLayer",
             "authenticated": true
         },

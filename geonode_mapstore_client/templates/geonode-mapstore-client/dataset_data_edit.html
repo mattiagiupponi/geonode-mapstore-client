@@ -13,13 +13,13 @@
                 function layerActionListener(action) {
                     MapStoreAPI.offAction('CHANGE_MAP_VIEW', layerActionListener);
                     MapStoreAPI.triggerAction({
-                        type: 'LAYERS:SELECT_NODE',
+                        type: 'DATASETS:SELECT_NODE',
                         id: layer.id,
                         nodeType: 'layer',
                         ctrlKey: false
                     });
                     MapStoreAPI.triggerAction({
-                        type: 'LAYERS:BROWSE_DATA',
+                        type: 'DATASETS:BROWSE_DATA',
                         layer
                     });
                 }

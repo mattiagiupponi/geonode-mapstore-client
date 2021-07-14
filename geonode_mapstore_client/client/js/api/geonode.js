@@ -10,7 +10,7 @@ import Rx from 'rxjs';
 import axios from '@mapstore/framework/libs/ajax';
 import { getConfigProp } from "@mapstore/framework/utils/ConfigUtils";
 
-const getLayerEditPerimissions = (name) => {
+const getDatasetEditPerimissions = (name) => {
     const baseUrl = getConfigProp("geonodeUrl") || "./";
     return axios.get(`${baseUrl}gs/${name}/edit-check`);
 };
@@ -23,7 +23,7 @@ const getStyleEditPerimissions = (name) => {
  * Retrieve layer's edit permission from local gs otherwise are false
  */
 export const layerEditPermissions = (layer) =>
-    Rx.Observable.defer(() => getLayerEditPerimissions(layer.name))
+    Rx.Observable.defer(() => getDatasetEditPerimissions(layer.name))
         .pluck("data")
         .map(({ authorized }) => ({ canEdit: authorized }));
 export const styleEditPermissions = (layer) =>

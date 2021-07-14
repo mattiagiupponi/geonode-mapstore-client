@@ -331,10 +331,10 @@
                     "perms": [{ "type": "user", "value": "add_resource" }],
                     "items": [
                         {
-                            "labelId": "gnhome.layer",
+                            "labelId": "gnhome.dataset",
                             "value": "layer",
                             "type": "link",
-                            "href": "/layers/upload",
+                            "href": "/datasets/upload",
                             "authenticated": true,
                             "perms": [{ "type": "user", "value": "add_resource" }]
                         },
@@ -462,13 +462,13 @@
         "menu": {
             "items": [
                 {
-                    "labelId": "gnhome.layers",
+                    "labelId": "gnhome.datasets",
                     "type": "dropdown",
                     "items": [
                         {
                             "type": "link",
                             "href": "#/search/?filter{resource_type.in}=layer",
-                            "labelId": "gnhome.layers",
+                            "labelId": "gnhome.datasets",
                             "badge": "{state('geoNodeResourcesInfo') && state('geoNodeResourcesInfo').layersTotalCount}",
                             "permissions": [],
                             "allowedRoles": []
@@ -482,7 +482,7 @@
                         },
                         {
                             "type": "link",
-                            "href": "/layers/upload",
+                            "href": "/datasets/upload",
                             "labelId": "gnhome.uploadLayer",
                             "authenticated": true,
                             "permissions": [],

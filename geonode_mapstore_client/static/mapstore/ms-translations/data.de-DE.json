@@ -1504,7 +1504,7 @@
                 "targetStore": "Ziel",
                 "storeType": "Art des Ziels",
                 "storeName": "Name des Ziels",
-                "layer": "Ebene",
+                "dataset": "Ebene",
                 "transforms": "Transformationen-Kette",
                 "update": "Update",
                 "run": "Importiere dieses Package",

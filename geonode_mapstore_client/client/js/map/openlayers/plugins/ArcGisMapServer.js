@@ -18,7 +18,7 @@ registerType('arcgis', {
             visible: options.visibility !== false,
             zIndex: options.zIndex,
             source: new TileArcGISRest({
-                params: { LAYERS: `show:${parseInt(options.name || 0, 10)}` },
+                params: { DATASETS: `show:${parseInt(options.name || 0, 10)}` },
                 url: options.url
             })
         });

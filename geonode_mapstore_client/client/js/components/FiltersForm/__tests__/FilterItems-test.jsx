@@ -26,7 +26,7 @@ describe('FilterItems component', () => {
             {
                 "type": "link",
                 "href": "/layers/",
-                "labelId": "gnhome.layers"
+                "labelId": "gnhome.datasets"
             }
         ];
         ReactDOM.render( <FilterItems items={items}/>, document.getElementById("container"));
@@ -95,7 +95,7 @@ describe('FilterItems component', () => {
                     {
                         "type": "link",
                         "href": "/layers/",
-                        "labelId": "gnhome.layers"
+                        "labelId": "gnhome.datasets"
                     }
                 ]
             }

@@ -21,7 +21,7 @@ const conf = {
                 {
                     "type": "link",
                     "href": "/layers/?limit=5",
-                    "labelId": "gnhome.layers",
+                    "labelId": "gnhome.datasets",
                     "badge": 1,
                     "permissions": [],
                     "allowedRoles": []
@@ -116,7 +116,7 @@ const conf = {
                 {
                     "type": "link",
                     "href": "/layers/?limit=5",
-                    "labelId": "gnhome.layers",
+                    "labelId": "gnhome.datasets",
                     "badge": 1,
                     "permissions": [],
                     "allowedRoles": []

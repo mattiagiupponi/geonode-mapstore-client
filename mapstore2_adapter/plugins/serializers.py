@@ -21,7 +21,7 @@ try:
     from urllib.parse import urlparse, parse_qs
 except ImportError:
     from urlparse import urlparse, parse_qs
-from geonode.layers.models import Layer
+from geonode.datasets.models import Layer
 from geonode.base.bbox_utils import BBOXHelper
 
 is_analytics_enabled = False
@@ -97,7 +97,7 @@ class GeoNodeSerializer(object):
                     "title": _map_title,
                     "abstract": _map_abstract}
                 _map_conf['sources'] = {}
-                from geonode.layers.views import layer_detail
+                from geonode.datasets.views import datasets_detail
                 _map_obj = data.pop('map', None)
                 if _map_obj:
                     _map_bbox = []
@@ -120,7 +120,7 @@ class GeoNodeSerializer(object):
                         _lyr_name = f"{_lyr_store}:{_lyr['name']}" if _lyr_store else _lyr['name']
                         try:
                             # Retrieve the Layer Params back from GeoNode
-                            _gn_layer = layer_detail(
+                            _gn_layer = datasets_detail(
                                 caller.request,
                                 _lyr_name)
                             if _gn_layer and _gn_layer.context_data:
