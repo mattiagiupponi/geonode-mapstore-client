@@ -467,7 +467,7 @@
                     "items": [
                         {
                             "type": "link",
-                            "href": "#/search/?filter{resource_type.in}=layer",
+                            "href": "#/search/?filter{resource_type.in}=dataset",
                             "labelId": "gnhome.datasets",
                             "badge": "{state('geoNodeResourcesInfo') && state('geoNodeResourcesInfo').layersTotalCount}",
                             "permissions": [],

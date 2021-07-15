@@ -98,59 +98,59 @@ class MapStoreHookSet(BaseHookSet):
             context['ms2_config'] = ms2_config
 
     # Layers
-    def datasets_detail_template(self, context=None):
+    def dataset_detail_template(self, context=None):
         self.initialize_context(
             context,
             callback=ms2_config_converter.convert)
         return 'geonode-mapstore-client/dataset_detail.html'
 
-    def datasets_new_template(self, context=None):
+    def dataset_new_template(self, context=None):
         self.initialize_context(
             context,
             callback=ms2_config_converter.convert)
         return 'geonode-mapstore-client/dataset_detail.html'
 
-    def datasets_view_template(self, context=None):
+    def dataset_view_template(self, context=None):
         self.initialize_context(
             context,
             callback=ms2_config_converter.convert)
         return 'geonode-mapstore-client/dataset_detail.html'
 
     # -- Not implemented yet
-    # def datasets_edit_template(self, context=None):
+    # def dataset_edit_template(self, context=None):
     #    self.initialize_context(
     #        context,
     #        callback=ms2_config_converter.convert)
     #    return 'geonode-mapstore-client/map_new.html'
 
-    def datasets_update_template(self, context=None):
+    def dataset_update_template(self, context=None):
         self.initialize_context(
             context,
             callback=ms2_config_converter.convert)
         return 'geonode-mapstore-client/dataset_detail.html'
 
-    def datasets_embed_template(self, context=None):
+    def dataset_embed_template(self, context=None):
         self.initialize_context(
             context,
             callback=ms2_config_converter.convert)
         return 'geonode-mapstore-client/dataset_embed.html'
 
-    def datasets_download_template(self, context=None):
+    def dataset_download_template(self, context=None):
         self.initialize_context(
             context,
             callback=ms2_config_converter.convert)
         return 'geonode-mapstore-client/dataset_detail.html'
 
-    def datasets_style_edit_template(self, context=None):
+    def dataset_style_edit_template(self, context=None):
         self.initialize_context(
             context,
             callback=ms2_config_converter.convert)
         return 'geonode-mapstore-client/dataset_style_edit.html'
 
-    def datasets_list_url(self):
+    def dataset_list_url(self):
         return resource_list_url('layer')
 
-    def datasets_detail_url(self, resource):
+    def dataset_detail_url(self, resource):
         return resource_detail_url('layer', resource.id)
 
     # Maps
