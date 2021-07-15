@@ -36,7 +36,7 @@ import searchconfig from '@mapstore/framework/reducers/searchconfig';
 import widgets from '@mapstore/framework/reducers/widgets';
 // end
 
-import LayerViewerRoute from '@js/routes/LayerViewer';
+import DatasetViewerRoute from '@js/routes/LayerViewer';
 import MapViewerRoute from '@js/routes/MapViewer';
 import GeoStoryViewerRoute from '@js/routes/GeoStoryViewer';
 import DocumentViewerRoute from '@js/routes/DocumentViewer';
@@ -86,25 +86,25 @@ const ConnectedRouter = connect((state) => ({
 
 const routes = [
     {
-        name: 'layer_viewer',
+        name: 'dataset_viewer',
         path: [
-            '/layer/:pk'
+            '/dataset/:pk'
         ],
-        component: LayerViewerRoute
+        component: DatasetViewerRoute
     },
     {
-        name: 'layer_edit_data_viewer',
+        name: 'dataset_edit_data_viewer',
         path: [
-            '/layer/:pk/edit/data'
+            '/dataset/:pk/edit/data'
         ],
-        component: LayerViewerRoute
+        component: DatasetViewerRoute
     },
     {
-        name: 'layer_edit_style_viewer',
+        name: 'dataset_edit_style_viewer',
         path: [
-            '/layer/:pk/edit/style'
+            '/dataset/:pk/edit/style'
         ],
-        component: LayerViewerRoute
+        component: DatasetViewerRoute
     },
     {
         name: 'map_viewer',
