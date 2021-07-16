@@ -320,10 +320,10 @@
                     "perms": [{ "type": "user", "value": "add_resource" }],
                     "items": [
                         {
-                            "labelId": "gnhome.layer",
+                            "labelId": "gnhome.dataset",
                             "value": "layer",
                             "type": "link",
-                            "href": "/layers/upload",
+                            "href": "/datasets/upload",
                             "authenticated": true,
                             "perms": [{ "type": "user", "value": "add_resource" }]
                         },
@@ -2290,7 +2290,7 @@
                 "name": "Notifications"
             }
         ],
-        "layer_viewer": [
+        "dataset_viewer": [
             {
                 "name": "ViewerLayout"
             },
@@ -2848,7 +2848,6 @@
                         {
                             "labelId": "gnviewer.save",
                             "type": "dropdown",
-                            "perms": [{ "type": "resource", "value": "change_resourcebase" }],
                             "items": [
                                 {
                                     "type": "plugin",

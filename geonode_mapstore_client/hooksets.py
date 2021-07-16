@@ -98,59 +98,59 @@ class MapStoreHookSet(BaseHookSet):
             context['ms2_config'] = ms2_config
 
     # Layers
-    def layer_detail_template(self, context=None):
+    def dataset_detail_template(self, context=None):
         self.initialize_context(
             context,
             callback=ms2_config_converter.convert)
-        return 'geonode-mapstore-client/legacy/layer_detail.html'
+        return 'geonode-mapstore-client/legacy/dataset_detail.html'
 
-    def layer_new_template(self, context=None):
+    def dataset_new_template(self, context=None):
         self.initialize_context(
             context,
             callback=ms2_config_converter.convert)
-        return 'geonode-mapstore-client/legacy/layer_detail.html'
+        return 'geonode-mapstore-client/legacy/dataset_detail.html'
 
-    def layer_view_template(self, context=None):
+    def dataset_view_template(self, context=None):
         self.initialize_context(
             context,
             callback=ms2_config_converter.convert)
-        return 'geonode-mapstore-client/legacy/layer_detail.html'
+        return 'geonode-mapstore-client/legacy/dataset_detail.html'
 
     # -- Not implemented yet
-    # def layer_edit_template(self, context=None):
+    # def dataset_edit_template(self, context=None):
     #    self.initialize_context(
     #        context,
     #        callback=ms2_config_converter.convert)
     #    return 'geonode-mapstore-client/legacy/map_new.html'
 
-    def layer_update_template(self, context=None):
+    def dataset_update_template(self, context=None):
         self.initialize_context(
             context,
             callback=ms2_config_converter.convert)
-        return 'geonode-mapstore-client/legacy/layer_detail.html'
+        return 'geonode-mapstore-client/legacy/dataset_detail.html'
 
-    def layer_embed_template(self, context=None):
+    def dataset_embed_template(self, context=None):
         self.initialize_context(
             context,
             callback=ms2_config_converter.convert)
         return 'geonode-mapstore-client/layer_embed.html'
 
-    def layer_download_template(self, context=None):
+    def dataset_download_template(self, context=None):
         self.initialize_context(
             context,
             callback=ms2_config_converter.convert)
-        return 'geonode-mapstore-client/legacy/layer_detail.html'
+        return 'geonode-mapstore-client/legacy/dataset_detail.html'
 
-    def layer_style_edit_template(self, context=None):
+    def dataset_style_edit_template(self, context=None):
         self.initialize_context(
             context,
             callback=ms2_config_converter.convert)
-        return 'geonode-mapstore-client/legacy/layer_style_edit.html'
+        return 'geonode-mapstore-client/legacy/dataset_style_edit.html'
 
-    def layer_list_url(self):
+    def dataset_list_url(self):
         return resource_list_url('layer')
 
-    def layer_detail_url(self, resource):
+    def dataset_detail_url(self, resource):
         return resource_detail_url('layer', resource.id)
 
     # Maps
@@ -165,9 +165,9 @@ class MapStoreHookSet(BaseHookSet):
             context,
             callback=ms2_config_converter.convert)
         if self.isEditLayer(context):
-            return 'geonode-mapstore-client/legacy/layer_data_edit.html'
+            return 'geonode-mapstore-client/legacy/dataset_data_edit.html'
         elif self.isViewLayer(context):
-            return 'geonode-mapstore-client/legacy/layer_view.html'
+            return 'geonode-mapstore-client/legacy/dataset_view.html'
         else:
             return 'geonode-mapstore-client/legacy/map_new.html'
 

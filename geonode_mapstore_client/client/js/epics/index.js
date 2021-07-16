@@ -14,7 +14,7 @@ import Rx from "rxjs";
 import { setEditPermissionStyleEditor, INIT_STYLE_SERVICE } from "@mapstore/framework/actions/styleeditor";
 import { getSelectedLayer, layersSelector } from "@mapstore/framework/selectors/layers";
 import { getConfigProp } from "@mapstore/framework/utils/ConfigUtils";
-import { getLayerByName, getLayersByName } from '@js/api/geonode/v2';
+import { getDatasetByName, getDatasetsByName } from '@js/api/geonode/v2';
 import { updateMapLayout } from '@mapstore/framework/actions/maplayout';
 import { TOGGLE_CONTROL, SET_CONTROL_PROPERTY, SET_CONTROL_PROPERTIES } from '@mapstore/framework/actions/controls';
 import { MAP_CONFIG_LOADED } from '@mapstore/framework/actions/config';
@@ -68,7 +68,7 @@ export const gnSetLayersPermissions = (actions$, { getState = () => {}} = {}) =>
         .switchMap((action) => {
             if (action.type === MAP_CONFIG_LOADED) {
                 const layerNames = action.config?.map?.layers?.filter((l) => l?.group !== "background").map((l) => l.name);
-                return Rx.Observable.defer(() => getLayersByName(layerNames))
+                return Rx.Observable.defer(() => getDatasetsByName(layerNames))
                     .switchMap((layers = []) => {
                         const stateLayers = layers.map((l) => ({
                             ...l,
@@ -77,7 +77,7 @@ export const gnSetLayersPermissions = (actions$, { getState = () => {}} = {}) =>
                         return Rx.Observable.of(...stateLayers.map((l) => updateNode(l.id, 'layer', {perms: l.perms || []}) ));
                     });
             }
-            return Rx.Observable.defer(() => getLayerByName(action.layer?.name))
+            return Rx.Observable.defer(() => getDatasetByName(action.layer?.name))
                 .switchMap((layer = {}) => {
                     const layerId = layersSelector(getState())?.find((la) => la.name === layer.alternate)?.id;
                     return Rx.Observable.of(updateNode(layerId, 'layer', {perms: layer.perms}));

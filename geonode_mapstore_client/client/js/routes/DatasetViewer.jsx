@@ -30,7 +30,7 @@ const ConnectedPluginsContainer = connect((state) => ({
     }
 }))(PluginsContainer);
 
-function LayerViewerRoute({
+function DatasetViewerRoute({
     name,
     pluginsConfig: propPluginsConfig,
     params,
@@ -82,11 +82,11 @@ function LayerViewerRoute({
     );
 }
 
-LayerViewerRoute.propTypes = {
+DatasetViewerRoute.propTypes = {
     onUpdate: PropTypes.func
 };
 
-const ConnectedLayerViewerRoute = connect(
+const ConnectedDatasetViewerRoute = connect(
     createSelector([
         state => state?.gnresource?.data,
         state => state?.localConfig?.siteName || "Geonode"
@@ -94,8 +94,8 @@ const ConnectedLayerViewerRoute = connect(
     {
         onUpdate: requestLayerConfig
     }
-)(LayerViewerRoute);
+)(DatasetViewerRoute);
 
-ConnectedLayerViewerRoute.displayName = 'ConnectedLayerViewerRoute';
+ConnectedDatasetViewerRoute.displayName = 'ConnectedDatasetViewerRoute';
 
-export default ConnectedLayerViewerRoute;
+export default ConnectedDatasetViewerRoute;
