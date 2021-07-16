@@ -73,7 +73,7 @@ export const gnViewerrequestDatasetConfig = (action$) =>
                     ...(newLayer?.bbox?.bounds
                         ? [ zoomToExtent(newLayer.bbox.bounds, 'EPSG:4326') ]
                         : []),
-                    selectNode(newLayer.id, 'dataset', false),
+                    selectNode(newLayer.id, 'layer', false),
                     setResource(gnLayer),
                     setResourceId(pk),
                     setResourceType('dataset'),
@@ -84,7 +84,7 @@ export const gnViewerrequestDatasetConfig = (action$) =>
                         : []),
                     ...(page === 'dataset_edit_style_viewer'
                         ? [
-                            showSettings(newLayer.id, 'datasets', {
+                            showSettings(newLayer.id, 'layers', {
                                 opacity: newLayer.opacity || 1
                             }),
                             setControlProperty('layersettings', 'activeTab', 'style'),

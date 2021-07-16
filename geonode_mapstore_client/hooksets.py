@@ -133,7 +133,7 @@ class MapStoreHookSet(BaseHookSet):
         self.initialize_context(
             context,
             callback=ms2_config_converter.convert)
-        return 'geonode-mapstore-client/layer_embed.html'
+        return 'geonode-mapstore-client/dataset_embed.html'
 
     def dataset_download_template(self, context=None):
         self.initialize_context(

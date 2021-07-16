@@ -43,8 +43,8 @@ export const gnCheckSelectedDatasetPermissions = (action$, { getState } = {}) =>
             const state = getState() || {};
             const layer = getSelectedLayer(state);
             const permissions = layer?.perms || [];
-            const canEditStyles = permissions.includes("change_layer_style");
-            const canEdit = permissions.includes("change_layer_data");
+            const canEditStyles = permissions.includes("change_dataset_style");
+            const canEdit = permissions.includes("change_dataset_data");
             return layer
                 ? Rx.Observable.of(
                     setPermission({canEdit}),
