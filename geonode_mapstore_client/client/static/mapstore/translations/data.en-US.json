@@ -40,7 +40,7 @@
             "groups": "Groups",
             "groupsCategories": "Groups categories",
             "view": "View",
-            "viewLayer": "View dataset",
+            "viewDataset": "View dataset",
             "viewMap": "View map",
             "viewGeoStory": "View GeoStory",
             "viewDocument": "View document",

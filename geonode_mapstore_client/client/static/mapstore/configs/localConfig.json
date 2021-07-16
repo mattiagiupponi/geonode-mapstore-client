@@ -2847,6 +2847,7 @@
                     "leftMenuItems": [
                         {
                             "labelId": "gnviewer.save",
+                            "perms": [{ "type": "resource", "value": "change_resourcebase" }],
                             "type": "dropdown",
                             "items": [
                                 {
