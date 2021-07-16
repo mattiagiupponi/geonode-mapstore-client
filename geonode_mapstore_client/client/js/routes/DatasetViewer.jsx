@@ -16,7 +16,7 @@ import { getMonitoredState } from '@mapstore/framework/utils/PluginsUtils';
 import { getConfigProp } from '@mapstore/framework/utils/ConfigUtils';
 import PluginsContainer from '@mapstore/framework/components/plugins/PluginsContainer';
 import useLazyPlugins from '@js/hooks/useLazyPlugins';
-import { requestLayerConfig } from '@js/actions/gnviewer';
+import { requestDatasetConfig } from '@js/actions/gnviewer';
 import MetaTags from "@js/components/MetaTags";
 
 
@@ -92,7 +92,7 @@ const ConnectedDatasetViewerRoute = connect(
         state => state?.localConfig?.siteName || "Geonode"
     ], (resource, siteName) => ({resource, siteName})),
     {
-        onUpdate: requestLayerConfig
+        onUpdate: requestDatasetConfig
     }
 )(DatasetViewerRoute);
 

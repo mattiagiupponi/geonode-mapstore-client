@@ -53,14 +53,14 @@ class MapStoreHookSet(BaseHookSet):
         return None
 
     # return if we are editing a layer or creating a new map
-    def isEditLayer(self, context):
+    def isEditDataset(self, context):
         if context:
             req = self.get_request(context)
             if req.GET.get("layer") and req.GET.get("subtype"):
                 return True
         return False
 
-    def isViewLayer(self, context):
+    def isViewDataset(self, context):
         if context:
             req = self.get_request(context)
             if req.GET.get("layer") and req.GET.get("view"):
@@ -148,10 +148,10 @@ class MapStoreHookSet(BaseHookSet):
         return 'geonode-mapstore-client/legacy/dataset_style_edit.html'
 
     def dataset_list_url(self):
-        return resource_list_url('layer')
+        return resource_list_url('dataset')
 
     def dataset_detail_url(self, resource):
-        return resource_detail_url('layer', resource.id)
+        return resource_detail_url('dataset', resource.id)
 
     # Maps
     def map_detail_template(self, context=None):
@@ -164,9 +164,9 @@ class MapStoreHookSet(BaseHookSet):
         self.initialize_context(
             context,
             callback=ms2_config_converter.convert)
-        if self.isEditLayer(context):
+        if self.isEditDataset(context):
             return 'geonode-mapstore-client/legacy/dataset_data_edit.html'
-        elif self.isViewLayer(context):
+        elif self.isViewDataset(context):
             return 'geonode-mapstore-client/legacy/dataset_view.html'
         else:
             return 'geonode-mapstore-client/legacy/map_new.html'

@@ -22,7 +22,7 @@ import { SIZE_CHANGE, CLOSE_FEATURE_GRID, OPEN_FEATURE_GRID, setPermission } fro
 import { CLOSE_IDENTIFY, ERROR_FEATURE_INFO, TOGGLE_MAPINFO_STATE, LOAD_FEATURE_INFO, EXCEPTIONS_FEATURE_INFO, PURGE_MAPINFO_RESULTS } from '@mapstore/framework/actions/mapInfo';
 import { SHOW_SETTINGS, HIDE_SETTINGS, SELECT_NODE, updateNode, ADD_LAYER } from '@mapstore/framework/actions/layers';
 import { isMapInfoOpen } from '@mapstore/framework/selectors/mapInfo';
-import { setSelectedLayerPermissions } from '@js/actions/gnresource';
+import { setSelectedDatasetPermissions } from '@js/actions/gnresource';
 import { isFeatureGridOpen, getDockSize } from '@mapstore/framework/selectors/featuregrid';
 import head from 'lodash/head';
 import get from 'lodash/get';
@@ -35,7 +35,7 @@ import { showCoordinateEditorSelector } from '@mapstore/framework/selectors/cont
 /**
  * Handles checking and for permissions of a layer when its selected
  */
-export const gnCheckSelectedLayerPermissions = (action$, { getState } = {}) =>
+export const gnCheckSelectedDatasetPermissions = (action$, { getState } = {}) =>
     action$.ofType(SELECT_NODE, INIT_STYLE_SERVICE)
         .filter(({ nodeType }) => nodeType && nodeType === "layer" && !getConfigProp("disableCheckEditPermissions")
         || !nodeType && !getConfigProp("disableCheckEditPermissions"))
@@ -49,12 +49,12 @@ export const gnCheckSelectedLayerPermissions = (action$, { getState } = {}) =>
                 ? Rx.Observable.of(
                     setPermission({canEdit}),
                     setEditPermissionStyleEditor(canEditStyles),
-                    setSelectedLayerPermissions(permissions)
+                    setSelectedDatasetPermissions(permissions)
                 )
                 : Rx.Observable.of(
                     setPermission({canEdit: false}),
                     setEditPermissionStyleEditor(false),
-                    setSelectedLayerPermissions([])
+                    setSelectedDatasetPermissions([])
                 );
         });
 
@@ -63,7 +63,7 @@ export const gnCheckSelectedLayerPermissions = (action$, { getState } = {}) =>
  * Checks the permissions for layers when a map is loaded and when a new layer is added
  * to a map
  */
-export const gnSetLayersPermissions = (actions$, { getState = () => {}} = {}) =>
+export const gnSetDatasetsPermissions = (actions$, { getState = () => {}} = {}) =>
     actions$.ofType(MAP_CONFIG_LOADED, ADD_LAYER)
         .switchMap((action) => {
             if (action.type === MAP_CONFIG_LOADED) {
@@ -155,7 +155,7 @@ export const updateMapLayoutEpic = (action$, store) =>
             }));
         });
 export default {
-    gnCheckSelectedLayerPermissions,
+    gnCheckSelectedDatasetPermissions,
     updateMapLayoutEpic,
-    gnSetLayersPermissions
+    gnSetDatasetsPermissions
 };

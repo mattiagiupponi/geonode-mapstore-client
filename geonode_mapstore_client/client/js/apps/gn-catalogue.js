@@ -62,8 +62,8 @@ import {
 import { updateGeoNodeSettings } from '@js/actions/gnsettings';
 
 import {
-    gnCheckSelectedLayerPermissions,
-    gnSetLayersPermissions
+    gnCheckSelectedDatasetPermissions,
+    gnSetDatasetsPermissions
 } from '@js/epics';
 import gnviewerEpics from '@js/epics/gnviewer';
 import gnsearchEpics from '@js/epics/gnsearch';
@@ -231,8 +231,8 @@ Promise.all([
                     appEpics: {
                         ...standardEpics,
                         ...configEpics,
-                        gnCheckSelectedLayerPermissions,
-                        gnSetLayersPermissions,
+                        gnCheckSelectedDatasetPermissions,
+                        gnSetDatasetsPermissions,
                         ...pluginsDefinition.epics,
                         ...gnviewerEpics,
                         ...gnsearchEpics,

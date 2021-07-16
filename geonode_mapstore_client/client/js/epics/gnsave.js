@@ -39,7 +39,7 @@ import {
     getResourceByPk,
     createGeoStory,
     updateGeoStory,
-    updateLayer,
+    updateDataset,
     createMap,
     updateMap,
     updateDocument
@@ -126,7 +126,7 @@ const SaveAPI = {
             'abstract': metadata.description,
             'thumbnail_url': metadata.thumbnail
         };
-        return id ? updateLayer(id, body) : false;
+        return id ? updateDataset(id, body) : false;
     }
 };
 
