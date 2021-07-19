@@ -197,7 +197,7 @@ describe('gnsave epics', () => {
 
     it('test gnSetDatasetsPermissions trigger updateNode for MAP_CONFIG_LOADED', (done) => {
         mockAxios.onGet().reply(() => [200,
-            {layers: [{perms: ['change_dataset_style', 'change_dataset_data'], alternate: "testLayer"}]}]);
+            {datasets: [{perms: ['change_dataset_style', 'change_dataset_data'], alternate: "testLayer"}]}]);
         const NUM_ACTIONS = 1;
         testEpic(gnSetDatasetsPermissions, NUM_ACTIONS, configureMap({map: {layers: [{name: "testLayer", id: "test_id"}]}}), (actions) => {
             try {
@@ -212,7 +212,7 @@ describe('gnsave epics', () => {
 
     it('test gnSetDatasetsPermissions trigger updateNode for ADD_LAYER', (done) => {
         mockAxios.onGet().reply(() => [200,
-            {layers: [{perms: ['change_dataset_style', 'change_dataset_data'], alternate: "testLayer"}]}]);
+            {datasets: [{perms: ['change_dataset_style', 'change_dataset_data'], alternate: "testLayer"}]}]);
         const NUM_ACTIONS = 1;
         testEpic(gnSetDatasetsPermissions, NUM_ACTIONS, addLayer({name: "testLayer"}), (actions) => {
             try {
