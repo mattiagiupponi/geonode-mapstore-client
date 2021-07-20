@@ -21,7 +21,7 @@ try:
     from urllib.parse import urlparse, parse_qs
 except ImportError:
     from urlparse import urlparse, parse_qs
-from geonode.datasets.models import Dataset
+from geonode.layers.models import Dataset
 from geonode.base.bbox_utils import BBOXHelper
 
 is_analytics_enabled = False
@@ -97,7 +97,7 @@ class GeoNodeSerializer(object):
                     "title": _map_title,
                     "abstract": _map_abstract}
                 _map_conf['sources'] = {}
-                from geonode.datasets.views import dataset_detail
+                from geonode.layers.views import dataset_detail
                 _map_obj = data.pop('map', None)
                 if _map_obj:
                     _map_bbox = []
