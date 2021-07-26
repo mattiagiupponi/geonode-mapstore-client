@@ -77,14 +77,14 @@ function updateUrlQueryParameter(requestUrl, query) {
 }
 
 export const getResourceTypesInfo = () => ({
-    'layer': {
+    'dataset': {
         icon: 'layer-group',
         formatEmbedUrl: (resource) => updateUrlQueryParameter(resource.embed_url, {
             config: 'layer_preview',
             theme: 'preview'
         }),
-        formatDetailUrl: (resource) => (`/viewer/#/layer/${resource.pk}`),
-        name: 'Layer'
+        formatDetailUrl: (resource) => (`/catalogue/#/dataset/${resource.pk}`),
+        name: 'Dataset'
     },
     'map': {
         icon: 'map-marked',
@@ -92,35 +92,59 @@ export const getResourceTypesInfo = () => ({
             config: 'map_preview',
             theme: 'preview'
         }),
-        formatDetailUrl: (resource) => (`/viewer/#/map/${resource.pk}`),
+        formatDetailUrl: (resource) => (`/catalogue/#/map/${resource.pk}`),
         name: 'Map'
     },
     'document': {
         icon: 'file',
         name: 'Document',
-        formatDetailUrl: (resource) => (`/viewer/#/document/${resource.pk}`)
+        formatDetailUrl: (resource) => (`/catalogue/#/document/${resource.pk}`)
     },
     'geostory': {
         icon: 'book-open',
         name: 'GeoStory',
-        formatDetailUrl: (resource) => (`/viewer/#/geostory/${resource.pk}`)
+        formatDetailUrl: (resource) => (`/catalogue/#/geostory/${resource.pk}`)
     },
     'image': {
         icon: 'file-image',
         name: 'Image',
-        formatDetailUrl: (resource) => (`/viewer/#/document/${resource.pk}`)
+        formatDetailUrl: (resource) => (`/catalogue/#/document/${resource.pk}`)
     },
     'video': {
         icon: 'file-video',
         name: 'Video',
-        formatDetailUrl: (resource) => (`/viewer/#/document/${resource.pk}`)
+        formatDetailUrl: (resource) => (`/catalogue/#/document/${resource.pk}`)
     }
 });
+
+export function clearQueryParams(location) {
+    const { query } = url.parse(location.search, true);
+    const newParams = Object.keys(query)
+        .reduce((acc, key) =>
+            key.indexOf('filter') === 0
+            || key === 'f'
+            || key === 'q'
+                ? {
+                    ...acc,
+                    [key]: []
+                }
+                : acc, { extent: undefined });
+    return newParams;
+}
+
+export function getQueryFilters(query) {
+    const queryFilters = Object.keys(query).reduce((acc, key) => key.indexOf('sort') === 0
+        ? acc
+        : [...acc, ...castArray(query[key]).map((value) => ({ key, value }))], []);
+    return queryFilters;
+}
 
 export default {
     getQueryKeys,
     getPageSize,
     hashLocationToHref,
     getUserName,
-    getResourceTypesInfo
+    getResourceTypesInfo,
+    clearQueryParams,
+    getQueryFilters
 };

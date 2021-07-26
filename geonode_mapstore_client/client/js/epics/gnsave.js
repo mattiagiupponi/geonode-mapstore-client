@@ -18,6 +18,7 @@ import {
 import { saveMapConfiguration } from '@mapstore/framework/utils/MapUtils';
 import { getConfigProp } from '@mapstore/framework/utils/ConfigUtils';
 import { currentStorySelector } from '@mapstore/framework/selectors/geostory';
+import { widgetsConfig } from '@mapstore/framework/selectors/widgets';
 import { userSelector } from '@mapstore/framework/selectors/security';
 import { error as errorNotification, success as successNotification } from '@mapstore/framework/actions/notifications';
 import {
@@ -33,17 +34,16 @@ import {
     resourceLoading,
     setResource,
     resourceError,
-    updateResourceProperties,
-    SET_FAVORITE_RESOURCE
+    updateResourceProperties
 } from '@js/actions/gnresource';
 import {
     getResourceByPk,
     createGeoApp,
     updateGeoApp,
+    updateDataset,
     createMap,
     updateMap,
-    updateDocument,
-    setFavoriteResource
+    updateDocument
 } from '@js/api/geonode/v2';
 import { parseDevHostname } from '@js/utils/APIUtils';
 import uuid from 'uuid';
@@ -53,10 +53,9 @@ import {
     getResourceThumbnail
 } from '@js/selectors/gnresource';
 
-const GEOAPPS_MAPPER = ['geostory', 'dashboard']
 
 const SaveAPI = {
-    map: (state, id, metadata, reload, _resource_type) => {
+    map: (state, id, metadata, reload) => {
         const map =  mapSelector(state) || {};
         const layers = layersSelector(state);
         const groups = groupsSelector(state);
@@ -84,13 +83,14 @@ const SaveAPI = {
             : createMap(body)
                 .then((response) => {
                     if (reload) {
-                        window.location.href = parseDevHostname(`${getConfigProp('geonodeUrl')}viewer/#/map/${response.pk}`);
+                        const { geonodeUrl = '/' } = getConfigProp('geoNodeSettings') || {};
+                        window.location.href = parseDevHostname(`${geonodeUrl}catalogue/#/map/${response.pk}`);
                         window.location.reload();
                     }
                     return response.data;
                 });
     },
-    geoapp: (state, id, metadata, reload, resource_type) => {
+    geostory: (state, id, metadata, reload) => {
         const story = currentStorySelector(state);
         const user = userSelector(state);
         const body = {
@@ -104,11 +104,37 @@ const SaveAPI = {
             : createGeoApp({
                 'name': metadata.name + ' ' + uuid(),
                 'owner': user.name,
-                'resource_type': resource_type,
+                'resource_type': 'geostory',
                 ...body
             }).then((response) => {
                 if (reload) {
-                    window.location.href = parseDevHostname(`${getConfigProp('geonodeUrl')}viewer/#/geostory/${response.pk}`);
+                    const { geonodeUrl = '/' } = getConfigProp('geoNodeSettings') || {};
+                    window.location.href = parseDevHostname(`${geonodeUrl}catalogue/#/geostory/${response.pk}`);
+                    window.location.reload();
+                }
+                return response.data;
+            });
+    },
+    dashboard: (state, id, metadata, reload) => {
+        const dashboard = widgetsConfig(state);
+        const user = userSelector(state);
+        const body = {
+            'title': metadata.name,
+            'abstract': metadata.description,
+            'thumbnail_url': metadata.thumbnail,
+            'data': dashboard
+        };
+        return id
+            ? updateGeoApp(id, body)
+            : createGeoApp({
+                'name': metadata.name + ' ' + uuid(),
+                'owner': user.name,
+                'resource_type': 'dashboard',
+                ...body
+            }).then((response) => {
+                if (reload) {
+                    const { geonodeUrl = '/' } = getConfigProp('geoNodeSettings') || {};
+                    window.location.href = parseDevHostname(`${geonodeUrl}catalogue/#/dashboard/${response.pk}`);
                     window.location.reload();
                 }
                 return response.data;
@@ -123,20 +149,23 @@ const SaveAPI = {
 
         return id ? updateDocument(id, body) : false;
 
+    },
+    dataset: (state, id, metadata) => {
+        const body = {
+            'title': metadata.name,
+            'abstract': metadata.description,
+            'thumbnail_url': metadata.thumbnail
+        };
+        return id ? updateDataset(id, body) : false;
     }
 };
 
 export const gnSaveContent = (action$, store) =>
     action$.ofType(SAVE_CONTENT)
         .switchMap((action) => {
-            var resourceType = null;
             const state = store.getState();
-            var contentType = state.gnresource?.type || 'map';
-            if (GEOAPPS_MAPPER.includes(contentType)) {
-                resourceType = contentType;
-                contentType = 'geoapp';
-            }
-            return Observable.defer(() => SaveAPI[contentType](state, action.id, action.metadata, action.reload, resourceType))
+            const contentType = state.gnresource?.type || 'map';
+            return Observable.defer(() => SaveAPI[contentType](state, action.id, action.metadata, action.reload))
                 .switchMap((response) => {
                     return Observable.of(
                         saveSuccess(response),
@@ -216,31 +245,8 @@ export const gnUpdateResource = (action$, store) =>
                 .startWith(resourceLoading());
         });
 
-export const gnSaveFavoriteContent = (action$, store) =>
-    action$.ofType(SET_FAVORITE_RESOURCE)
-        .switchMap((action) => {
-            const state = store.getState();
-            const pk = state?.gnresource?.data.pk;
-            const favorite =  action.favorite;
-            return Observable
-                .defer(() => setFavoriteResource(pk, favorite))
-                .switchMap(() => {
-                    return Observable.of(
-                        updateResourceProperties({
-                            'favorite': favorite
-                        })
-                    );
-                })
-                .catch((error) => {
-                    return Observable.of(resourceError(error.data || error.message));
-                });
-
-        });
-
-
 export default {
     gnSaveContent,
     gnUpdateResource,
-    gnSaveDirectContent,
-    gnSaveFavoriteContent
+    gnSaveDirectContent
 };
