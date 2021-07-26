@@ -19,14 +19,14 @@ import isString from 'lodash/isString';
 import isObject from 'lodash/isObject';
 import castArray from 'lodash/castArray';
 import get from 'lodash/get';
-import { getUserInfo } from '@js/api/geonode/v1';
+import { getUserInfo } from '@js/api/geonode/user';
 import { setFilterById } from '@js/utils/GNSearchUtils';
 
 let endpoints = {
     // default values
     'resources': '/api/v2/resources',
     'documents': '/api/v2/documents',
-    'layers': '/api/v2/layers',
+    'datasets': '/api/v2/datasets',
     'maps': '/api/v2/maps',
     'geoapps': '/api/v2/geoapps',
     'users': '/api/v2/users',
@@ -39,7 +39,7 @@ let endpoints = {
 
 const RESOURCES = 'resources';
 const DOCUMENTS = 'documents';
-const LAYERS = 'layers';
+const DATASETS = 'datasets';
 const MAPS = 'maps';
 const GEOAPPS = 'geoapps';
 const USERS = 'users';
@@ -253,9 +253,9 @@ export const getResourceByPk = (pk) => {
         .then(({ data }) => data.resource);
 };
 
-export const getLayerByPk = (pk) => {
-    return axios.get(parseDevHostname(`${endpoints[LAYERS]}/${pk}`))
-        .then(({ data }) => data.layer);
+export const getDatasetByPk = (pk) => {
+    return axios.get(parseDevHostname(`${endpoints[DATASETS]}/${pk}`))
+        .then(({ data }) => data.dataset);
 };
 
 export const getDocumentByPk = (pk) => {
@@ -290,6 +290,12 @@ export const updateGeoApp = (pk, body) => {
         }
     })
         .then(({ data }) => data.geoapp);
+};
+
+
+export const updateDataset = (pk, body) => {
+    return axios.patch(parseDevHostname(`${endpoints[DATASETS]}/${pk}`), body)
+        .then(({ data }) => (data.dataset));
 };
 
 export const updateDocument = (pk, body) => {
@@ -379,21 +385,21 @@ export const getResourceTypes = ({}, filterKey = 'resource-types') => {
         });
 };
 
-export const getLayerByName = name => {
-    const url = parseDevHostname(`${endpoints[LAYERS]}/?filter{alternate}=${name}`);
+export const getDatasetByName = name => {
+    const url = parseDevHostname(`${endpoints[DATASETS]}/?filter{alternate}=${name}`);
     return axios.get(url)
-        .then(({data}) => data?.layers[0]);
+        .then(({data}) => data?.datasets[0]);
 };
 
-export const getLayersByName = names => {
-    const url = parseDevHostname(endpoints[LAYERS]);
+export const getDatasetsByName = names => {
+    const url = parseDevHostname(endpoints[DATASETS]);
     return axios.get(url, {
         params: {
             page_size: names.length,
             'filter{alternate.in}': names
         }
     })
-        .then(({data}) => data?.layers);
+        .then(({data}) => data?.datasets);
 };
 
 export const getResourcesTotalCount = () => {
@@ -588,6 +594,7 @@ export default {
     createGeoApp,
     getGeoAppByPk,
     updateGeoApp,
+    updateDataset,
     getMaps,
     getDocumentsByDocType,
     getUserByPk,
@@ -595,7 +602,7 @@ export default {
     getConfiguration,
     getResourceTypes,
     getResourcesTotalCount,
-    getLayerByPk,
+    getDatasetByPk,
     getDocumentByPk,
     createMap,
     updateMap,
