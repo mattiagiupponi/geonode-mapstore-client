@@ -108,7 +108,7 @@ export function setupConfiguration({
     );
     const supportedLocales = defaultSupportedLocales || getSupportedLocales();
     setSupportedLocales(supportedLocales);
-    const locale = supportedLocales[geoNodePageConfig.languageCode]?.code || 'en';
+    const locale = supportedLocales[geoNodePageConfig.languageCode]?.code;
     setConfigProp('locale', locale);
     const geoNodeResourcesInfo = getConfigProp('geoNodeResourcesInfo') || {};
     setConfigProp('geoNodeResourcesInfo', { ...geoNodeResourcesInfo, ...resourcesTotalCount });
@@ -155,7 +155,10 @@ export function setupConfiguration({
         geoNodePageConfig,
         pluginsConfigKey: query.config || geoNodePageConfig.pluginsConfigKey,
         mapType: geoNodePageConfig.mapType,
-        settings: localConfig.geoNodeSettings,
+        settings: {
+            geonodeUrl: localConfig.geonodeUrl,
+            geoserverUrl: localConfig.geoserverUrl
+        },
         permissions: {
             canEdit,
             canView
@@ -176,7 +179,7 @@ export function setupConfiguration({
     };
 }
 
-export function getThemeLayoutSize(width) {
+export function getPageSize(width) {
     if (width < 968) {
         return 'sm';
     }

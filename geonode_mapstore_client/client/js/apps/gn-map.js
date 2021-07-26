@@ -58,8 +58,8 @@ import { updateGeoNodeSettings } from '@js/actions/gnsettings';
 
 import {
     updateMapLayoutEpic,
-    gnCheckSelectedDatasetPermissions,
-    gnSetDatasetsPermissions
+    gnCheckSelectedLayerPermissions,
+    gnSetLayersPermissions
 } from '@js/epics';
 import maplayout from '@mapstore/framework/reducers/maplayout';
 import 'react-widgets/dist/css/react-widgets.css';
@@ -174,8 +174,8 @@ Promise.all([
                         ...standardEpics,
                         ...configEpics,
                         updateMapLayoutEpic,
-                        gnCheckSelectedDatasetPermissions,
-                        gnSetDatasetsPermissions,
+                        gnCheckSelectedLayerPermissions,
+                        gnSetLayersPermissions,
                         ...pluginsDefinition.epics
                     },
                     geoNodeConfiguration,

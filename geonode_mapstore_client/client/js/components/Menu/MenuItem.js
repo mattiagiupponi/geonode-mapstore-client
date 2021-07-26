@@ -10,6 +10,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import castArray from 'lodash/castArray';
+import Tag from '@js/components/home/Tag';
 import Badge from '@js/components/Badge';
 import NavLink from './NavLink';
 import Message from '@mapstore/framework/components/I18N/Message';
@@ -39,11 +40,10 @@ import {
  *
  */
 
-const MenuItem = ({ item, menuItemsProps, containerNode, tabIndex, classItem, size, alignRight, variant }) => {
+const MenuItem = ({ item, menuItemsProps, containerNode, tabIndex, draggable, classItem, size, alignRight, variant }) => {
 
     const { formatHref, query } = menuItemsProps;
     const { id, type, label, labelId = '', items = [], href, style, badge = '', image, Component, target } = item;
-    const btnClassName = `btn${variant && ` btn-${variant}` || ''}${size && ` btn-${size}` || ''}`;
 
     const badgeValue = badge;
     if (type === 'dropdown') {
@@ -64,39 +64,42 @@ const MenuItem = ({ item, menuItemsProps, containerNode, tabIndex, classItem, si
         />);
     }
 
-    if ((type === 'custom' || type === 'plugin') && Component) {
-        return <Component variant={variant} size={size}/>;
+    if (type === 'custom' && Component) {
+        return <Component />;
     }
 
     if (type === 'link') {
         return (
-            <NavLink href={href} target={target} className={btnClassName}>{labelId && <Message msgId={labelId} /> || label}</NavLink>
+            <NavLink href={href} target={target} className={variant ? `btn btn-${variant}` : ''}>{labelId && <Message msgId={labelId} /> || label}</NavLink>
         );
 
     }
 
     if (type === 'divider') {
-        return <div className="gn-menu-divider" style={style}></div>;
+        return <div className="gn-menu-index-divider" style={style}></div>;
     }
-
     if (type === 'filter') {
         const active = castArray(query.f || []).find(value => value === item.id);
         return (
-            <NavLink
-                target={target}
+            <Tag
+                tabIndex={tabIndex}
+                draggable={draggable}
+                active={active}
                 style={style}
                 href={formatHref({
                     query: { f: item.id },
                     replaceQuery: active ? false : true
                 })}
-                className={btnClassName}
+                variant={variant}
             >
                 {labelId && <Message msgId={labelId} /> || label}
                 {isValidBadgeValue(badgeValue) && <Badge>{badgeValue}</Badge>}
-            </NavLink>
+            </Tag>
         );
     }
     return null;
+
+
 };
 
 MenuItem.propTypes = {

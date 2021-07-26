@@ -20,7 +20,7 @@ export default (key, initialValue) => {
             return item ? JSON.parse(item) : initialValue;
         } catch (error) {
             // Todo log error in persistent solution
-            console.log(`Error to get item key “${key}”:`, error); // eslint-disable-line no-console
+            console.log(`Error to get item key “${key}”:`, error);
             return initialValue;
         }
     };
@@ -36,7 +36,7 @@ export default (key, initialValue) => {
             window.dispatchEvent(new Event('localStorage'));
         } catch (error) {
             // Todo log error in persistent solution
-            console.log(`Error “${key}”:`, error); // eslint-disable-line no-console
+            console.log(`Error “${key}”:`, error);
         }
     };
 

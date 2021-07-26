@@ -91,7 +91,7 @@ MapViewerRoute.propTypes = {
 const ConnectedMapViewerRoute = connect(
     createSelector([
         state => state?.gnresource?.data,
-        state => state?.gnsettings?.siteName || "Geonode"
+        state => state?.localConfig?.siteName || "Geonode"
     ], (resource, siteName) => ({resource, siteName})),
     {
         onUpdate: requestMapConfig,
