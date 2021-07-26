@@ -70,14 +70,11 @@ const SavePlugin = connect(
 
 function SaveButton({
     enabled,
-    onClick,
-    variant,
-    size
+    onClick
 }) {
     return enabled
         ? <Button
-            variant={variant || "primary"}
-            size={size}
+            variant="primary"
             onClick={() => onClick()}
         >
             <Message msgId="save"/>
@@ -126,6 +123,7 @@ export default createPlugin('Save', {
         },
         ActionNavbar: {
             name: 'Save',
+            target: 'leftMenuItem',
             Component: ConnectedSaveButton
         }
     },

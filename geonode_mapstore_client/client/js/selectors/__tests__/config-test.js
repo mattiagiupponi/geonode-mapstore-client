@@ -27,8 +27,42 @@ describe('config selector', () => {
             }
         ]);
         setConfigProp('geoNodeConfiguration', {
+            "menu": {
+                "items": [
+                    {
+                        "type": "link",
+                        "href": "{'/user/' + state('user').pk}",
+                        "labelId": "labelId",
+                        "authenticated": true
+                    }
+                ],
+                "rightItems": [
+                    {
+                        "type": "link",
+                        "href": "/#",
+                        "labelId": "labelId",
+                        "authenticated": false
+                    }
+                ]
+            },
+            "navbar": {
+                "items": [
+                    {
+                        "type": "link",
+                        "href": "/#",
+                        "labelId": "labelId"
+                    }
+                ]
+            },
             "cardsMenu": {
                 "items": []
+            },
+            "footer": {
+                "items": [{
+                    "type": "link",
+                    "href": "/#",
+                    "labelId": "labelId"
+                }]
             },
             "cardOptions": {
                 "items": [{
@@ -53,7 +87,24 @@ describe('config selector', () => {
             }
         };
         const parsedConfiguration = getParsedGeoNodeConfiguration(state);
+        expect(parsedConfiguration.menuItemsLeftAllowed).toEqual([{
+            "type": "link",
+            "href": "/user/1",
+            "labelId": "labelId",
+            "authenticated": true
+        }]);
+        expect(parsedConfiguration.menuItemsRightAllowed).toEqual([]);
+        expect(parsedConfiguration.navbarItemsAllowed).toEqual([{
+            "type": "link",
+            "href": "/#",
+            "labelId": "labelId"
+        }]);
         expect(parsedConfiguration.filterMenuItemsAllowed).toEqual([]);
+        expect(parsedConfiguration.footerMenuItemsAllowed).toEqual([{
+            "type": "link",
+            "href": "/#",
+            "labelId": "labelId"
+        }]);
         expect(parsedConfiguration.cardOptionsItemsAllowed).toEqual([{
             "type": "link",
             "href": "/#",
@@ -66,7 +117,7 @@ describe('config selector', () => {
             "options": []
         }]);
     });
-    it('getCustomMenuFilters', () => {
+    it('getParsedGeoNodeConfiguration', () => {
         setConfigProp('monitorState', [
             {
                 "name": "user",
@@ -74,6 +125,28 @@ describe('config selector', () => {
             }
         ]);
         setConfigProp('geoNodeConfiguration', {
+            "menu": {
+                "items": [
+                    {
+                        "id": "my-resources",
+                        "labelId": "myResources",
+                        "type": "filter",
+                        "query": {
+                            "filter{owner.pk}": "{state('user') && state('user').pk}"
+                        },
+                        "authenticated": true
+                    },
+                    {
+                        "id": "map",
+                        "labelId": "map",
+                        "type": "filter",
+                        "query": {
+                            "filter{resource_type}": "map"
+                        },
+                        "authenticated": false
+                    }
+                ]
+            },
             "filtersForm": {
                 "items": [{
                     "id": "pending-approval",
@@ -109,6 +182,13 @@ describe('config selector', () => {
         };
         const menuFilters = getCustomMenuFilters(state);
         expect(menuFilters).toEqual([
+            {
+                id: 'my-resources',
+                labelId: 'myResources',
+                type: 'filter',
+                query: { 'filter{owner.pk}': 1 },
+                authenticated: true
+            },
             {
                 id: 'pending-approval',
                 labelId: 'pendingApproval',

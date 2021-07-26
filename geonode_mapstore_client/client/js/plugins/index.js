@@ -12,8 +12,7 @@ import { extendPluginsDefinition } from '@extend/jsapi/plugins';
 import {
     PrintActionButton,
     CatalogActionButton,
-    MeasureActionButton,
-    LayerDownloadActionButton
+    MeasureActionButton
 } from '@js/plugins/actionnavbar/buttons';
 
 function toLazyPlugin(name, imp, overrides) {
@@ -84,15 +83,7 @@ function splitLazyAndStaticPlugins(pluginsDefinition) {
 export const plugins = {
     LayerDownloadPlugin: toLazyPlugin(
         'LayerDownload',
-        import(/* webpackChunkName: 'plugins/layer-download' */ '@mapstore/framework/plugins/LayerDownload'),
-        {
-            containers: {
-                ActionNavbar: {
-                    name: 'LayerDownload',
-                    Component: LayerDownloadActionButton
-                }
-            }
-        }
+        import(/* webpackChunkName: 'plugins/layer-download' */ '@mapstore/framework/plugins/LayerDownload')
     ),
     SwipePlugin: toLazyPlugin(
         'Swipe',
@@ -117,6 +108,7 @@ export const plugins = {
             containers: {
                 ActionNavbar: {
                     name: 'Catalog',
+                    target: 'leftMenuItem',
                     Component: CatalogActionButton,
                     priority: 1
                 },
@@ -164,6 +156,7 @@ export const plugins = {
             containers: {
                 ActionNavbar: {
                     name: 'Measure',
+                    target: 'leftMenuItem',
                     Component: MeasureActionButton
                 }
             }
@@ -272,6 +265,7 @@ export const plugins = {
             containers: {
                 ActionNavbar: {
                     name: 'Print',
+                    target: 'leftMenuItem',
                     Component: PrintActionButton,
                     priority: 5,
                     doNotHide: true
@@ -307,6 +301,10 @@ export const plugins = {
         'ActionNavbar',
         import(/* webpackChunkName: 'plugins/action-navbar-plugin' */ '@js/plugins/ActionNavbar')
     ),
+    BrandNavbarPlugin: toLazyPlugin(
+        'BrandNavbar',
+        import(/* webpackChunkName: 'plugins/brand-navbar-plugin' */ '@js/plugins/BrandNavbar')
+    ),
     DetailViewerPlugin: toLazyPlugin(
         'DetailViewer',
         import(/* webpackChunkName: 'plugins/detail-viewer-plugin' */ '@js/plugins/DetailViewer')
@@ -314,19 +312,8 @@ export const plugins = {
     MediaViewerPlugin: toLazyPlugin(
         'MediaViewer',
         import(/* webpackChunkName: 'plugins/media-viewer-plugin' */ '@js/plugins/MediaViewer')
-    ),
-    FitBoundsPlugin: toLazyPlugin(
-        'FitBounds',
-        import(/* webpackChunkName: 'plugins/fit-bounds-plugin' */ '@js/plugins/FitBounds')
-    ),
-    DashboardEditorPlugin: toLazyPlugin(
-        'DashboardEditor',
-        import(/* webpackChunkName: 'plugins/dashboard-editor-plugin' */ '@mapstore/framework/plugins/DashboardEditor')
-    ),
-    DashboardPlugin: toLazyPlugin(
-        'Dashboard',
-        import(/* webpackChunkName: 'plugins/dashboard-plugin' */ '@mapstore/framework/plugins/Dashboard')
     )
+
 
 };
 

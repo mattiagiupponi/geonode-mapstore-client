@@ -13,7 +13,7 @@ import BurgerMenu from '@js/components/Menu/BurgerMenu';
 import useResizeElement from '@js/hooks/useResizeElement';
 
 
-const LeftContentMenu = ({ items, formatHref, query, variant, size }) => {
+const LeftContentMenu = ({ items, formatHref, query }) => {
 
     const navbarContentLeft = useRef();
     const navbarLeft = useRef();
@@ -26,11 +26,11 @@ const LeftContentMenu = ({ items, formatHref, query, variant, size }) => {
 
     return (
         <div
-            className={`gn-menu-content-side gn-menu-content-left`}
+            className={`gn-action-navbar-content-left`}
             ref={navbarContentLeft}
         >
             {
-                (switchToBurgerMenu) && items && <BurgerMenu items={items} variant={variant}/>
+                (switchToBurgerMenu) && items && <BurgerMenu items={items} />
             }
 
             { (!switchToBurgerMenu) && items &&
@@ -38,11 +38,11 @@ const LeftContentMenu = ({ items, formatHref, query, variant, size }) => {
                 <Menu
                     ref={navbarLeft}
                     items={items}
-                    containerClass={`gn-menu-list`}
+                    containerClass={`gn-brand-navbar-left-side`}
+                    childrenClass={`gn-user-dropdown`}
                     formatHref={formatHref}
                     query={query}
-                    variant={variant}
-                    size={size}
+                    variant="primary"
                 />
 
             }
@@ -52,7 +52,7 @@ const LeftContentMenu = ({ items, formatHref, query, variant, size }) => {
 };
 
 
-const RightContentMenu = ({ items, formatHref, query, parentRef, cfg, variant, size }) => {
+const RightContentMenu = ({ items, formatHref, query, parentRef, cfg }) => {
 
     const navbarContentRight = useRef();
     const navbarRight = useRef();
@@ -68,24 +68,24 @@ const RightContentMenu = ({ items, formatHref, query, parentRef, cfg, variant, s
     return (
         <div
             ref={navbarContentRight}
-            className={`gn-menu-content-right`}
+            className={`gn-action-navbar-content-right`}
             style={cfg?.style}
         >
 
             {
-                (switchToBurgerMenu) && items && <BurgerMenu items={items} variant={variant}/>
+                (switchToBurgerMenu) && items && <BurgerMenu items={items} />
             }
 
             {(!switchToBurgerMenu) && items &&
                 <Menu
                     ref={navbarRight}
                     items={items}
-                    containerClass={`gn-menu-list`}
+                    containerClass={`gn-brand-navbar-right-side`}
+                    childrenClass={`gn-user-dropdown`}
                     formatHref={formatHref}
                     query={query}
-                    variant={variant}
+                    variant="primary"
                     alignRight
-                    size={size}
                 />
 
             }
@@ -103,21 +103,20 @@ const ActionNavbar = forwardRef(({
     rightItems,
     query,
     formatHref,
-    cfg,
-    variant,
-    size
+    tools,
+    cfg
 }, ref) => {
 
     return (
         <nav
             ref={ref}
-            className={`gn-menu gn-${variant}`}
+            className={`gn-action-navbar`}
             style={style}
         >
-            <div className={`gn-menu-container`}>
+            <div className={`gn-action-navbar-container`}>
 
                 <div
-                    className={`gn-menu-content`}
+                    className={`gn-action-navbar-content`}
                 >
 
                     {
@@ -126,8 +125,6 @@ const ActionNavbar = forwardRef(({
                             items={leftItems}
                             formatHref={formatHref}
                             query={query}
-                            variant={variant}
-                            size={size}
                         />
                     }
 
@@ -140,10 +137,13 @@ const ActionNavbar = forwardRef(({
                             query={query}
                             parentRef={ref}
                             cfg={cfg?.rightContents}
-                            variant={variant}
-                            size={size}
                         />
                     }
+
+
+                    <div className={`gn-action-navbar-content-tools`}>
+                        {tools}
+                    </div>
                 </div>
 
 
@@ -159,16 +159,14 @@ ActionNavbar.propTypes = {
     leftItems: PropTypes.array,
     rightItems: PropTypes.array,
     query: PropTypes.object,
-    formatHref: PropTypes.func,
-    variant: PropTypes.string
+    formatHref: PropTypes.func
 };
 
 ActionNavbar.defaultProps = {
     leftItems: [],
     rightItems: [],
     query: {},
-    formatHref: () => '#',
-    variant: 'primary'
+    formatHref: () => '#'
 };
 
 

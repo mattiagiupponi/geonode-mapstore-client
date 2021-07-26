@@ -10,13 +10,11 @@ import React from 'react';
 import { createPlugin } from '@mapstore/framework/utils/PluginsUtils';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
-import DetailsPanel from '@js/components/DetailsPanel';
-import { userSelector } from '@mapstore/framework/selectors/security';
+import DetailsPanel from '@js/components/home/DetailsPanel';
 import {
     editTitleResource,
     editAbstractResource,
-    editThumbnailResource,
-    setFavoriteResource
+    editThumbnailResource
 } from '@js/actions/gnresource';
 import controls from '@mapstore/framework/reducers/controls';
 import {toggleControl} from '@mapstore/framework/actions/controls';
@@ -33,24 +31,21 @@ import PropTypes from 'prop-types';
 const ConnectedDetailsPanel = connect(
     createSelector([
         state => state?.gnresource?.data || null,
-        state => state?.gnresource?.loading || false,
-        state => state?.gnresource?.data?.favorite || false
-    ], (resource, loading, favorite) => ({
+        state => state?.gnresource?.loading || false
+    ], (resource, loading, editMode) => ({
         resource,
         loading,
-        favorite
+        editMode
     })),
     {
-        closePanel: toggleControl.bind(null, 'DetailViewer', null),
-        onFavorite: setFavoriteResource
+        closePanel: toggleControl.bind(null, 'DetailViewer', null)
     }
 )(DetailsPanel);
 
 const ButtonViewer = ({
     onClick,
-    hide,
-    variant,
-    size
+    isEnabledViewer,
+    hide
 }) => {
 
     const handleClickButton = () => {
@@ -59,10 +54,9 @@ const ButtonViewer = ({
 
     return !hide
         ? (<Button
-            variant={variant}
-            size={size}
+            variant="primary"
             onClick={handleClickButton}
-        > <Message msgId="gnviewer.details"/>
+            active={!isEnabledViewer} > <Message msgId="gnviewer.details"/>
         </Button>)
         : null
     ;
@@ -70,10 +64,12 @@ const ButtonViewer = ({
 
 const ConnectedButton = connect(
     createSelector([
+        state => state?.controls?.DetailViewer?.enabled || false,
         isNewResource,
         getResourceId
     ],
-    (isNew, resourcePk) => ({
+    (isEnabledViewer, isNew, resourcePk) => ({
+        isEnabledViewer,
         hide: isNew || !resourcePk
     })),
     {
@@ -89,8 +85,7 @@ function DetailViewer({
     onEditThumbnail,
     canEdit,
     width,
-    hide,
-    user
+    hide
 }) {
 
     const handleTitleValue = (val) => {
@@ -119,7 +114,6 @@ function DetailViewer({
                     editAbstract={handleAbstractValue}
                     editThumbnail={handleEditThumbnail}
                     activeEditMode={!enabled && canEdit}
-                    enableFavorite={!!user}
                     sectionStyle={{
                         width,
                         position: 'fixed'
@@ -143,13 +137,11 @@ const DetailViewerPlugin = connect(
         state => state?.controls?.DetailViewer?.enabled || false,
         canEditResource,
         isNewResource,
-        getResourceId,
-        userSelector
-    ], (enabled, canEdit, isNew, resourcePk, user) => ({
+        getResourceId
+    ], (enabled, canEdit, isNew, resourcePk) => ({
         enabled,
         canEdit,
-        hide: isNew || !resourcePk,
-        user
+        hide: isNew || !resourcePk
     })),
     {
         onEditResource: editTitleResource,
@@ -168,7 +160,8 @@ export default createPlugin('DetailViewer', {
             priority: 1
         },
         ActionNavbar: {
-            name: 'DetailViewerButton',
+            name: 'ButtonViewer',
+            target: 'leftMenuItem',
             Component: ConnectedButton,
             priority: 1
         }

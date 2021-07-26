@@ -46,8 +46,7 @@ function ZoomTo({
             }
             map.getView().fit(bounds, {
                 size: map.getSize(),
-                duration: 300,
-                nearest: true
+                duration: 300
             });
             // ensure to avoid other fit action by setting once to true
             once.current = true;
@@ -59,6 +58,7 @@ function ZoomTo({
 
 function FilterByExtent({
     id,
+    queryExtent,
     extent,
     projection,
     onChange,
@@ -67,13 +67,13 @@ function FilterByExtent({
 }) {
 
     const enabled = !!extent;
-    const [currentExtent, setCurrentExtent] = useState();
-    const countInitialMapMoveEnd = useRef(0);
+    const [tmpExtent, setTmpExtent] = useState();
+    const isFirstMapViewChange = useRef(true);
 
     function handleOnSwitch(event) {
         onChange({
             extent: event.target.checked
-                ? currentExtent
+                ? tmpExtent
                 : undefined
         });
     }
@@ -81,15 +81,14 @@ function FilterByExtent({
     function handleOnMapViewChanges(center, zoom, bbox) {
         const { bounds, crs } = bbox;
         const newExtent = boundsToExtentString(bounds, crs);
-        // map triggers two move end event on mount
-        if (countInitialMapMoveEnd.current < 2) {
-            countInitialMapMoveEnd.current += 1;
+        if (isFirstMapViewChange.current) {
+            isFirstMapViewChange.current = false;
         } else if (enabled) {
             onChange({
                 extent: newExtent
             });
         }
-        setCurrentExtent(newExtent);
+        setTmpExtent(newExtent);
     }
 
     return (
@@ -133,11 +132,11 @@ function FilterByExtent({
                     }}
                     layers={[
                         ...(layers ? layers : []),
-                        ...(extent
+                        ...(queryExtent
                             ? [{
                                 id: 'highlight',
                                 type: 'vector',
-                                features: [getFeatureFromExtent(extent)],
+                                features: [getFeatureFromExtent(queryExtent)],
                                 style: vectorLayerStyle
                                     ? { ...vectorLayerStyle,  weight: 0.001 }
                                     : {
@@ -152,7 +151,7 @@ function FilterByExtent({
                         )
                     ]}
                 >
-                    <ZoomTo extent={extent} />
+                    <ZoomTo extent={queryExtent} />
                 </Map>
             </div>
         </FormGroup>

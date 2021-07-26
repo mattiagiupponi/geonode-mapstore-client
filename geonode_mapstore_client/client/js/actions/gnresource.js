@@ -19,7 +19,7 @@ export const EDIT_ABSTRACT_RESOURCE = 'GEONODE:EDIT_ABSTRACT_RESOURCE';
 export const EDIT_THUMBNAIL_RESOURCE = 'GEONODE:EDIT_THUMBNAIL_RESOURCE';
 export const SET_FAVORITE_RESOURCE = 'GEONODE:SET_FAVORITE_RESOURCE';
 
-export const SET_SELECTED_DATASET_PERMISSIONS = "GEONODE:SET_SELECTED_DATASET_PERMISSIONS";
+export const SET_SELECTED_LAYER_PERMISSIONS = "GEONODE:SET_SELECTED_LAYER_PERMISSIONS";
 
 
 /**
@@ -82,11 +82,11 @@ export function editAbstractResource(abstract) {
 * @param {string} image resource
 */
 
-export function editThumbnailResource(thumbnailUrl) {
+export function editThumbnailResource(thumbnail_url) {
 
     return {
         type: EDIT_THUMBNAIL_RESOURCE,
-        thumbnailUrl
+        thumbnail_url
     };
 }
 
@@ -170,9 +170,9 @@ export function setResourcePermissions(permissions) {
 * @param {bool} permissions.canView can view permission
 */
 
-export function setSelectedDatasetPermissions(permissions) {
+export function setSelectedLayerPermissions(permissions) {
     return {
-        type: SET_SELECTED_DATASET_PERMISSIONS,
+        type: SET_SELECTED_LAYER_PERMISSIONS,
         permissions
     };
 }

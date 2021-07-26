@@ -40,7 +40,7 @@
             "groups": "Gruppen",
             "groupsCategories": "Gruppenkategorien",
             "view": "Ansehen",
-            "viewDataset": "Ebene dataset",
+            "viewLayer": "Ebene dataset",
             "viewMap": "Karte ansehen",
             "viewGeoStory": "GeoStory ansehen",
             "viewDocument": "Dokument ansehen",
@@ -127,13 +127,7 @@
             "editStyle": "Stil Bearbeiten",
             "editData": "Daten Bearbeiten",
             "backToDataset": "Zurück zum Datensatz",
-            "uploadImage": "Klicken oder ziehen Sie ein Bild und legen Sie es ab",
-            "save": "Speichern",
-            "share": "Teilen",
-            "download": "Herunterladen",
-            "moreinfo": "Mehr Info"
-
-
+            "uploadImage": "Klicken oder ziehen Sie ein Bild und legen Sie es ab"
         }
 
     }

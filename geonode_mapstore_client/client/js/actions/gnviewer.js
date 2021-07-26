@@ -6,26 +6,33 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-export const REQUEST_DATASET_CONFIG = 'GEONODE_VIEWER:REQUEST_DATASET_CONFIG';
+export const REQUEST_LAYER_CONFIG = 'GEONODE_VIEWER:REQUEST_LAYER_CONFIG';
 export const REQUEST_MAP_CONFIG = 'GEONODE_VIEWER:REQUEST_MAP_CONFIG';
 export const REQUEST_NEW_MAP_CONFIG = 'GEONODE_VIEWER:REQUEST_NEW_MAP_CONFIG';
 export const REQUEST_GEOSTORY_CONFIG = 'GEONODE_VIEWER:REQUEST_GEOSTORY_CONFIG';
+export const REQUEST_DASHBOARD_CONFIG = 'GEONODE_VIEWER:REQUEST_DASHBOARD_CONFIG';
 export const REQUEST_DOCUMENT_CONFIG = 'GEONODE_VIEWER:REQUEST_DOCUMENT_CONFIG';
 export const REQUEST_NEW_GEOSTORY_CONFIG = "GEONODE:VIEWER:REQUEST_NEW_GEOSTORY_CONFIG";
-export const REQUEST_DASHBOARD_CONFIG = 'GEONODE_VIEWER:REQUEST_DASHBOARD_CONFIG';
 export const REQUEST_NEW_DASHBOARD_CONFIG = "GEONODE:VIEWER:REQUEST_NEW_DASHBOARD_CONFIG";
 
-export function requestDatasetConfig(pk, page) {
+
+export function requestLayerConfig(pk, page) {
     return {
-        type: REQUEST_DATASET_CONFIG,
+        type: REQUEST_LAYER_CONFIG,
         pk,
         page
     };
 }
 
-export function requestNewGeoStoryConfig() {
+export function requestNewGeostoryConfig() {
     return {
         type: REQUEST_NEW_GEOSTORY_CONFIG
+    };
+}
+
+export function requestNewDashboardConfig() {
+    return {
+        type: REQUEST_NEW_DASHBOARD_CONFIG
     };
 }
 
@@ -50,22 +57,16 @@ export function requestGeoStoryConfig(pk) {
     };
 }
 
-export function requestDocumentConfig(pk) {
+export function requestGDashboardConfig(pk) {
     return {
-        type: REQUEST_DOCUMENT_CONFIG,
+        type: REQUEST_DASHBOARD_CONFIG,
         pk
     };
 }
 
-export function requestNewDashboardConfig() {
+export function requestDocumentConfig(pk) {
     return {
-        type: REQUEST_NEW_DASHBOARD_CONFIG
-    };
-}
-
-export function requestDashboardConfig(pk) {
-    return {
-        type: REQUEST_DASHBOARD_CONFIG,
+        type: REQUEST_DOCUMENT_CONFIG,
         pk
     };
 }

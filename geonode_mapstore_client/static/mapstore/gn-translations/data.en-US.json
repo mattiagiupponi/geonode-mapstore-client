@@ -24,8 +24,8 @@
             "zA": "Z A",
             "mostPopular": "Most popular",
             "data": "Dati",
-            "dataset": "Dataset",
-            "datasets": "Datasets",
+            "layer": "Dataset",
+            "layers": "Datasets",
             "document": "Document",
             "documents": "Documents",
             "remoteServices": "Remote services",
@@ -33,6 +33,7 @@
             "geostory": "GeoStory",
             "geostories": "GeoStories",
             "createGeostory": "Create geostory",
+            "createDashboard": "Create dashboard",
             "createNew": "Create new",
             "maps": "Maps",
             "about": "About",
@@ -40,7 +41,7 @@
             "groups": "Groups",
             "groupsCategories": "Groups categories",
             "view": "View",
-            "viewDataset": "View dataset",
+            "viewLayer": "View dataset",
             "viewMap": "View map",
             "viewGeoStory": "View GeoStory",
             "viewDocument": "View document",
@@ -93,6 +94,7 @@
             "addRemoteService": "Add remote service",
             "exploreMaps": "Explore maps",
             "createMap": "Create map",
+            "dashboard": "Dashboard",
             "apps": "Apps",
             "createApp": "Create app",
             "announcements": "Announcements",
@@ -111,6 +113,7 @@
             "myResources": "My resources",
             "pendingApproval": "Pending approval",
             "featuredList": "Featured"
+
         },
         "viewer":{
             "document": {
@@ -126,12 +129,7 @@
             "editMetadata": "Edit Metadata",
             "editStyle": "Edit Style",
             "editData": "Edit Data",
-            "backToDataset": "Back to Dataset",
-            "uploadImage": "Click or drag and drop an image",
-            "save": "Save",
-            "share": "Share",
-            "download": "Download",
-            "moreinfo": "More info"
+            "backToDataset": "Back to Dataset"
         }
     }
 }

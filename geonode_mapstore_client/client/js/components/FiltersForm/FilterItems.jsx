@@ -22,7 +22,7 @@ function FilterItems({
     items,
     suggestionsRequestTypes,
     values,
-    onChange
+    setValues
 }) {
     return (
         <>
@@ -42,9 +42,9 @@ function FilterItems({
                         ? suggestionsRequestTypes[suggestionsRequestKey]?.filterKey
                         : `filter{${formId}.in}`;
 
-                    const currentValues = castArray(suggestionsRequestKey
+                    const currentValues = suggestionsRequestKey
                         ? values[suggestionsRequestTypes[suggestionsRequestKey]?.filterKey] || []
-                        : values[filterKey] || []);
+                        : values[filterKey] || [];
 
                     const optionsProp = suggestionsRequestKey
                         ? { loadOptions: suggestionsRequestTypes[suggestionsRequestKey]?.loadOptions }
@@ -61,7 +61,8 @@ function FilterItems({
                                 multi
                                 placeholder={placeholderId}
                                 onChange={(selected) => {
-                                    onChange({
+                                    setValues({
+                                        ...values,
                                         [filterKey]: selected.map(({ value }) => value)
                                     });
                                 }}
@@ -84,7 +85,7 @@ function FilterItems({
                             items={field.items}
                             suggestionsRequestTypes={suggestionsRequestTypes}
                             values={values}
-                            onChange={onChange}
+                            setValues={setValues}
                         />
                     </>);
                 }
@@ -104,7 +105,8 @@ function FilterItems({
                                 checked={!!active}
                                 value={field.id}
                                 onChange={() => {
-                                    onChange({
+                                    setValues({
+                                        ...values,
                                         f: active
                                             ? customFilters.filter(value => value !== field.id)
                                             : [...customFilters, field.id]
@@ -126,14 +128,14 @@ FilterItems.defaultProps = {
     items: PropTypes.array,
     suggestionsRequestTypes: PropTypes.object,
     values: PropTypes.object,
-    onChange: PropTypes.func
+    setValues: PropTypes.func
 };
 
 FilterItems.defaultProps = {
     items: [],
     suggestionsRequestTypes: {},
     values: {},
-    onChange: () => {}
+    setValues: () => {}
 };
 
 export default FilterItems;

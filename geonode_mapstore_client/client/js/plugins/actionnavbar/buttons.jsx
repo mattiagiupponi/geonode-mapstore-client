@@ -21,15 +21,10 @@ import Button from '@js/components/Button';
 export const PrintActionButton = connect(
     () => ({}),
     { onClick: toggleControl.bind(null, 'print', null) }
-)(({
-    onClick,
-    variant,
-    size
-}) => {
+)(({ onClick }) => {
     return (
         <Button
-            variant={variant}
-            size={size}
+            variant="primary"
             onClick={() => onClick()}
         >
             <Message msgId="printbutton"/>
@@ -40,15 +35,10 @@ export const PrintActionButton = connect(
 export const CatalogActionButton = connect(
     () => ({}),
     { onClick: setControlProperty.bind(null, 'metadataexplorer', 'enabled', true, true) }
-)(({
-    onClick,
-    variant,
-    size
-}) => {
+)(({ onClick }) => {
     return (
         <Button
-            variant={variant}
-            size={size}
+            variant="primary"
             onClick={() => onClick()}
         >
             <Message msgId="catalog.title"/>
@@ -59,37 +49,13 @@ export const CatalogActionButton = connect(
 export const MeasureActionButton = connect(
     () => ({}),
     { onClick: setControlProperty.bind(null, 'measure', 'enabled', true) }
-)(({
-    onClick,
-    variant,
-    size
-}) => {
+)(({ onClick }) => {
     return (
         <Button
-            variant={variant}
-            size={size}
+            variant="primary"
             onClick={() => onClick()}
         >
             <Message msgId="measureComponent.Measure"/>
-        </Button>
-    );
-});
-
-export const LayerDownloadActionButton = connect(
-    () => ({}),
-    { onClick: setControlProperty.bind(null, 'layerdownload', 'enabled', true, true) }
-)(({
-    onClick,
-    variant,
-    size
-}) => {
-    return (
-        <Button
-            variant={variant}
-            size={size}
-            onClick={() => onClick()}
-        >
-            <Message msgId="layerdownload.title"/>
         </Button>
     );
 });

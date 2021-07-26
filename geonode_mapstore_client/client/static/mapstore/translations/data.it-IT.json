@@ -24,8 +24,8 @@
             "zA": "Z A",
             "mostPopular": "Più popolare",
             "data": "Dati",
-            "dataset": "Dataset",
-            "datasets": "Datasets",
+            "layer": "Dataset",
+            "layers": "Datasets",
             "document": "Documento",
             "documents": "Documenti",
             "remoteServices": "Servizi remoti",
@@ -40,7 +40,7 @@
             "groups": "Gruppi",
             "groupsCategories": "Categorie gruppo",
             "view": "View",
-            "viewDataset": "Visualizza dataset",
+            "viewLayer": "Visualizza dataset",
             "viewMap": "Visualizza mappa",
             "viewGeoStory": "Visualizza GeoStory",
             "viewDocument": "Visualizza documento",
@@ -129,11 +129,7 @@
             "editStyle": "Modifica Stile",
             "editData": "Modifica Dati",
             "backToDataset": "Torna al Dataset",
-            "uploadImage": "Clicca o trascina un'immagine",
-            "save": "Salva",
-            "share": "Condividi",
-            "download": "Scarica",
-            "moreinfo": "Maggiori informazioni"
+            "uploadImage": "Clicca o trascina un'immagine"
         }
     }
 }

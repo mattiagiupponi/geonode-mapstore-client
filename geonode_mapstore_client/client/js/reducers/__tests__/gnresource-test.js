@@ -79,10 +79,8 @@ describe('gnresource reducer', () => {
     it('should test setNewResource', () => {
         const state = gnresource({}, setNewResource());
         expect(state).toEqual({
-            selectedLayerPermissions: [],
-            data: {},
-            permissions: [],
-            isNew: true
+            isNew: true,
+            data: {}
         });
     });
     it('should test setResourceId', () => {

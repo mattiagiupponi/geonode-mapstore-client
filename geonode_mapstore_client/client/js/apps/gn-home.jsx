@@ -15,10 +15,13 @@ import security from '@mapstore/framework/reducers/security';
 import controls from '@mapstore/framework/reducers/controls';
 
 import Home from '@js/routes/Home';
+import SearchRoute from '@js/routes/Search';
+import DetailRoute from '@js/routes/Detail';
 
 import gnsearch from '@js/reducers/gnsearch';
 import gnresource from '@js/reducers/gnresource';
 import gnsearchEpics from '@js/epics/gnsearch';
+import gnlocaleEpics from '@js/epics/gnlocale';
 import gnsaveEpics from '@js/epics/gnsave';
 
 import {
@@ -30,7 +33,8 @@ import {
 
 import {
     setupConfiguration,
-    initializeApp
+    initializeApp,
+    getVersion
 } from '@js/utils/AppUtils';
 
 const DEFAULT_LOCALE = {};
@@ -43,7 +47,23 @@ const routes = [
         name: 'homepage',
         path: '/',
         component: Home
+    },
+    {
+        name: 'resources',
+        path: [
+            '/search/'
+        ],
+        component: SearchRoute
+    },
+    {
+        name: 'detail',
+        path: [
+            '/detail/:pk',
+            '/detail/:ctype/:pk'
+        ],
+        component: DetailRoute
     }
+
 ];
 
 initializeApp();
@@ -74,7 +94,13 @@ Promise.all([
                 }
             },
             pluginsConfig: localConfig.plugins || [],
-            themeCfg: null,
+            themeCfg: {
+                path: '/static/mapstore/dist/themes',
+                prefixContainer: 'body',
+                version: getVersion(),
+                prefix: 'msgapi',
+                theme: 'geonode'
+            },
             appReducers: {
                 gnsearch,
                 gnresource,
@@ -83,6 +109,7 @@ Promise.all([
             },
             appEpics: {
                 ...gnsearchEpics,
+                ...gnlocaleEpics,
                 ...gnsaveEpics
             },
             geoNodeConfiguration

@@ -30,12 +30,20 @@ export const getParsedGeoNodeConfiguration = (state) => {
     };
     const userState = { user };
     const confWithHandleExpression = mapObjectFunc(v => handleExpression(getMonitorState, {}, v))(geoNodeConfiguration);
+    const menuItemsLeftAllowed = reduceArrayRecursive(confWithHandleExpression?.menu?.items, (item) => filterMenuItems(userState, item));
+    const menuItemsRightAllowed = reduceArrayRecursive(confWithHandleExpression?.menu?.rightItems, (item) => filterMenuItems(userState, item));
+    const navbarItemsAllowed = reduceArrayRecursive(confWithHandleExpression?.navbar?.items, (item) => filterMenuItems(userState, item));
     const filterMenuItemsAllowed = reduceArrayRecursive(confWithHandleExpression?.cardsMenu?.items, (item) => filterMenuItems(userState, item));
+    const footerMenuItemsAllowed = reduceArrayRecursive(confWithHandleExpression?.footer?.items, (item) => filterMenuItems(userState, item));
     const cardOptionsItemsAllowed = reduceArrayRecursive(confWithHandleExpression?.cardOptions?.items, (item) => filterMenuItems(userState, item));
     const filtersFormItemsAllowed = reduceArrayRecursive(confWithHandleExpression?.filtersForm?.items, (item) => filterMenuItems(userState, item));
     return {
         ...confWithHandleExpression,
+        menuItemsLeftAllowed,
+        menuItemsRightAllowed,
+        navbarItemsAllowed,
         filterMenuItemsAllowed,
+        footerMenuItemsAllowed,
         cardOptionsItemsAllowed,
         filtersFormItemsAllowed
     };
@@ -54,8 +62,10 @@ export const getCustomMenuFilters = (state) => {
     };
     const userState = { user };
     const confWithHandleExpression = mapObjectFunc(v => handleExpression(getMonitorState, {}, v))(geoNodeConfiguration);
+    const menuItemsLeftAllowed = reduceArrayRecursive(confWithHandleExpression?.menu?.items, (item) => filterMenuItems(userState, item));
     const filtersFormItemsAllowed = reduceArrayRecursive(confWithHandleExpression?.filtersForm?.items, (item) => filterMenuItems(userState, item));
     const menuFilters = [
+        ...menuItemsLeftAllowed,
         ...filtersFormItemsAllowed.reduce((acc, item) => [
             ...acc,
             ...(item.type === 'group'
