@@ -15,8 +15,6 @@
       <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="create-new-app-dropdown-menu">
       {% for app in GEONODE_APPS_INSTALLED %}
         <li>
-          <a href="{% url "new_geoapp" %}?appType=GeoStory">
-            {% blocktrans %}GeoStory{% endblocktrans %}
           <a href="{% url "new_geoapp" %}?appType={{app}}">
             {% blocktrans %}{{app}}{% endblocktrans %}
           </a>
